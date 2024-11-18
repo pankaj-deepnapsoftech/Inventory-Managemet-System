@@ -172,7 +172,7 @@ exports.loginWithToken = TryCatch(async (req, res) => {
 
     return res.status(200).json({
       status: 200,
-      success: false,
+      success: true,
       message: "Logged in successfully",
       user,
       token: newToken,
@@ -181,9 +181,12 @@ exports.loginWithToken = TryCatch(async (req, res) => {
   throw new ErrorHandler("Session expired, login again", 401);
 });
 exports.resetPasswordRequest = TryCatch(async (req, res) => {
-  const { _id: id } = req.user;
-
-  const user = await User.findById(id);
+  // const { _id: id } = req.user;
+  const {email} = req.body;
+  if(!email){
+    throw new ErrorHandler("Email Id not provided", 400);
+  }
+  const user = await User.findOne({email});
   if (!user) {
     throw new ErrorHandler("User doesn't exist", 400);
   }

@@ -1,26 +1,51 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./App.css";
+import Login from "./pages/Login";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Register from "./pages/Register";
+import Layout from "./pages/Layout";
+import routes from "./routes/routes";
 
-function App() {
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <ToastContainer />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<Layout />}>
+            {routes.map((route, ind) => {
+              if (route.isSublink) {
+                {route.sublink &&
+                    route.sublink.map((sublink, index) => {
+                      return (
+                        <Route
+                          key={index}
+                          path={sublink.path}
+                          element={sublink.element}
+                        ></Route>
+                      );
+                    });
+                }
+              } else {
+                return (
+                  <Route
+                    index={route.name === "Dashboard" ? true : false}
+                    key={ind}
+                    path={route.path}
+                    element={route.element}
+                  ></Route>
+                );
+              }
+            })}
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </div>
   );
-}
+};
 
 export default App;

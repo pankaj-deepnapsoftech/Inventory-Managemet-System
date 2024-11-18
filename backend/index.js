@@ -1,5 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const cors = require("cors");
 const { globalErrorHandler } = require('./middlewares/error');
 const { connectDB } = require('./utils/connectDB');
 
@@ -19,7 +20,7 @@ require('dotenv').config({ path: `.env.development` });
 
 // PRODUCTION ENVIRONMENT
 // require('dotenv').config({ path: `.env.production` });
-
+app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);

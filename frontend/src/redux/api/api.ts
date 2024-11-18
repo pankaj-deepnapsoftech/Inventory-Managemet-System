@@ -1,0 +1,78 @@
+import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
+import { parseCookies } from 'nookies';
+
+const api = createApi({
+    reducerPath: "api",
+    baseQuery: fetchBaseQuery({
+        baseUrl: process.env.REACT_APP_BACKEND_URL,
+        mode: 'cors',
+        prepareHeaders: (headers) => {
+            const cookies = parseCookies();
+            const token = cookies?.access_token;
+      
+            if (token) {
+              headers.set('Authorization', `Bearer ${token}`);
+            }
+      
+            return headers;
+          },
+    }),
+    tagTypes: ['Auth'],
+
+    endpoints: (builder) => ({
+        login: builder.mutation({
+            query: (data)=>({
+                url: 'auth/login',
+                method: "POST",
+                body: data
+            }),
+            invalidatesTags: ['Auth']
+        }),
+        loginWithToken: builder.query({
+            query: ()=>'auth/login'
+        }),
+        register: builder.mutation({
+            query: (data)=>({
+                url: 'auth/',
+                method: "POST",
+                body: data
+            }),
+            invalidatesTags: ['Auth']
+        }),
+        verifyUser: builder.mutation({
+            query: (data)=>({
+                url: 'auth/verify',
+                method: "POST",
+                body: data
+            }),
+            invalidatesTags: ['Auth']
+        }),
+        forgetPassword: builder.mutation({
+            query: (data)=>({
+                url: 'auth/reset-password-request',
+                method: "POST",
+                body: data
+            }),
+            invalidatesTags: ['Auth'],
+        }),
+        resetPassword: builder.mutation({
+            query: (data)=>({
+                url: 'auth/reset-password',
+                method: "POST",
+                body: data
+            }),
+            invalidatesTags: ['Auth']
+        }),
+        resendOTP: builder.mutation({
+            query: (data)=>({
+                url: 'auth/resend-otp',
+                method: "POST",
+                body: data
+            }),
+            invalidatesTags: ['Auth']
+        })
+    })
+});
+
+export default api;
+export const {useLoginMutation, useLazyLoginWithTokenQuery, useRegisterMutation, useVerifyUserMutation, useResendOTPMutation, useResetPasswordMutation, useForgetPasswordMutation} = api;

@@ -16,7 +16,7 @@ router.route('/user')
         .get(isAuthenticated, details)
         .put(isAuthenticated, update)
         .delete(isAuthenticated, remove);
-router.post('/reset-password-request', isAuthenticated, isUserVerified, resetPasswordRequest);
-router.post('/reset-password', isAuthenticated, isUserVerified, verifyOTP, resetPassword);
+router.post('/reset-password-request', isUserVerified, resetPasswordRequest);
+router.post('/reset-password', isUserVerified, verifyOTP, resetPassword);
 
 module.exports = router;
