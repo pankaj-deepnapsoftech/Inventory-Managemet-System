@@ -9,7 +9,7 @@ exports.globalErrorHandler = (err, req, res, next)=>{
         return res.status(400).json({
             status: 400,
             success: false,
-            msg: errorMessage
+            message: errorMessage
         });
     }
     else if(err.name === "MongoServerError" && err.code === 11000){
@@ -29,6 +29,9 @@ exports.globalErrorHandler = (err, req, res, next)=>{
         else if(err.message.includes('company_phone')){
             message = "Company Phone No. is already registered";
         }
+        else if(err.message.includes('role')){
+            message = "Role is already created";
+        }
         else{
             message = "A unique constraint error occurred";
         }
@@ -36,13 +39,13 @@ exports.globalErrorHandler = (err, req, res, next)=>{
         return res.status(400).json({
             status: 400,
             success: false,
-            msg: message
+            message: message
         });
     }
 
     return res.status(err.statusCode).json({
         status: err.statusCode,
         success: false,
-        msg: err.message
+        message: err.message
     })
 }

@@ -37,7 +37,11 @@ const productSchema = new Schema({
     },
     min_stock: Number,
     max_stock: Number,
-    hsn_code: Number,
+    hsn_code: String,
+    approved: {
+        type: Boolean,
+        default: false
+    }
     // tax: Number, // TODO -> Which taxes should be added
     // image: // TODO -> Should be kept or not
 }, {

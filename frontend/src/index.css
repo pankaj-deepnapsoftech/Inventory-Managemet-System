@@ -5,6 +5,10 @@
   font-family: "Nunito", sans-serif;
 }
 
+body{
+    background-color: #b3b3b3b3 !important;
+}
+
 #root{
     display: flex;
     flex-direction: column;

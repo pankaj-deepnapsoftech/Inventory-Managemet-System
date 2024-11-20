@@ -4,6 +4,7 @@ const userRoleSchema = new Schema({
     role: {
         type: String,
         required: [true, "Role is a required field"],
+        unique: true,
         minlength: [2, 'Role must be atleast 2 characters long'],
         maxlength: [20, 'Role cannot exceed 20 characters'],
     },

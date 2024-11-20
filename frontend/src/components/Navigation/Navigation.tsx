@@ -7,7 +7,7 @@ import { NavLink } from "react-router-dom";
 
 const Navigation: React.FC = () => {
   return (
-    <div className="px-3 py-3 overflow-auto bg-[#f9fafc]">
+    <div className="h-[inherit] px-3 py-3 overflow-auto bg-[#f9fafc]">
       <ul>
         {routes.map((route, ind) => {
           if (route.isSublink) {

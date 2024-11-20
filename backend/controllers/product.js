@@ -29,7 +29,7 @@ exports.update = TryCatch(async (req, res)=>{
         throw new ErrorHandler("Product doesn't exist", 400);
     }
 
-    product = await Product.findOneAndUpdate({_id}, {...productDetails}, {new: true});
+    product = await Product.findOneAndUpdate({_id}, {...productDetails, approved: req.user.isSuper ? productDetails?.approved : false}, {new: true});
 
     res.status(200).json({
         status: 200,
@@ -64,10 +64,18 @@ exports.details = TryCatch(async (req, res)=>{
     })
 });
 exports.all = TryCatch(async (req, res)=>{
-    const products = await Product.find({});
+    const products = await Product.find({approved: true});
     res.status(200).json({
         status: 200,
         success: true,
-        products
+        products,
     })
 })
+exports.unapproved = TryCatch(async (req, res)=>{
+    const unapprovedProducts = await Product.find({approved: false});
+    res.status(200).json({
+        status: 200,
+        success: true,
+        unapproved: unapprovedProducts
+    })
+});

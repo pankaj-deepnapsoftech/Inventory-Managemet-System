@@ -66,7 +66,7 @@ const Layout: React.FC = () => {
         >
           <Navigation />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 pr-5 w-[80%]">
           <Container>
             <Outlet />
           </Container>

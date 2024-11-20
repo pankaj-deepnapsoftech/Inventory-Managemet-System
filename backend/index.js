@@ -9,6 +9,7 @@ const authRoutes = require("./routes/user");
 const productRoutes = require("./routes/product");
 const storeRoutes = require("./routes/store");
 const agentRoutes = require("./routes/agent");
+const userRoleRoutes = require("./routes/userRole");
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/product', productRoutes);
 app.use('/api/store', storeRoutes);
 app.use('/api/agent', agentRoutes);
+app.use('/api/role', userRoleRoutes);
 
 app.use(globalErrorHandler);
 
