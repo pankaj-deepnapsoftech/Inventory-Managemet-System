@@ -34,7 +34,7 @@ const UserDetailsMenu: React.FC<UserDetailsMenuProps> = ({
       </div>
       <div
         className="cursor-pointer px-3 py-1 rounded-md hover:bg-[#e3e3e3] mt-2 font-semibold text-lg flex items-center gap-x-2 border-b"
-        // onClick={logoutHandler}
+        onClick={logoutHandler}
       >
         <span>
           <BiLogOutCircle />
@@ -42,7 +42,7 @@ const UserDetailsMenu: React.FC<UserDetailsMenuProps> = ({
         Logout
       </div>
       <div
-        // onClick={closeUserDetailsMenu}
+        onClick={closeUserDetailsMenu}
         className="cursor-pointer px-3 py-1 rounded-md hover:bg-[#e3e3e3] mt-2 font-semibold text-lg flex items-center gap-x-2"
       >
         <span className="">

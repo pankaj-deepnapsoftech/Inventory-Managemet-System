@@ -36,7 +36,7 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({email, setEmail, s
         setShowRegisterComponent(false);
         setShowOTPVerificationComponent(true);
       } catch (err: any) {
-        toast.error(err?.data?.msg || err?.message || "Something went wrong");
+        toast.error(err?.data?.message || err?.message || "Something went wrong");
       } finally{
         setIsRegistering(false);
       }

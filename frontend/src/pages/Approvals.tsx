@@ -1,7 +1,12 @@
 import { toast } from "react-toastify";
 import {
+  useDeleteAgentMutation,
   useDeleteProductMutation,
+  useDeleteStoresMutation,
   useLazyUnapprovedProductsQuery,
+  useUpdateAgentMutation,
+  useUpdateProductMutation,
+  useUpdateStoreMutation,
 } from "../redux/api/api";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
@@ -10,6 +15,8 @@ import { MdOutlineRefresh } from "react-icons/md";
 import ProductTable from "../components/Table/ProductTable";
 import UpdateProduct from "../components/Drawers/Product/UpdateProduct";
 import { FcDatabase } from "react-icons/fc";
+import StoreTable from "../components/Table/StoreTable";
+import BuyerTable from "../components/Table/BuyerTable";
 
 const Approvals: React.FC = () => {
   //   const [unapprovedProducts] = useLazyUnapprovedProductsQuery();
@@ -24,12 +31,32 @@ const Approvals: React.FC = () => {
   //   };
 
   const [cookies] = useCookies();
+  //  Products
+  const [productSearchKey, setProductSearchKey] = useState<
+    string | undefined
+  >();
   const [products, setProducts] = useState<any>([]);
   const [filteredProducts, setFilteredProducts] = useState<any>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
+  //  Stores
+  const [storeSearchKey, setStoreSearchKey] = useState<string | undefined>();
+  const [stores, setStores] = useState<any>([]);
+  const [filteredStores, setFilteredStores] = useState<any>([]);
+  const [isLoadingStores, setIsLoadingStores] = useState<boolean>(false);
+  //  Stores
+  const [buyerSearchKey, setBuyerSearchKey] = useState<string | undefined>();
+  const [buyers, setBuyers] = useState<any>([]);
+  const [filteredBuyers, setFilteredBuyers] = useState<any>([]);
+  const [isLoadingBuyers, setIsLoadingBuyers] = useState<boolean>(false);
 
   const [deleteProduct] = useDeleteProductMutation();
+  const [updateProduct] = useUpdateProductMutation();
+  const [deleteStore] = useDeleteStoresMutation();
+  const [updateStore] = useUpdateStoreMutation();
+  const [deleteAgent] = useDeleteAgentMutation();
+  const [updateAgent] = useUpdateAgentMutation();
 
+  // For Unapproved Products
   const fetchUnapprovedProductsHandler = async () => {
     try {
       setIsLoadingProducts(true);
@@ -54,30 +81,14 @@ const Approvals: React.FC = () => {
 
   const approveProductHandler = async (id: string) => {
     try {
-      const response = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "product/",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cookies?.access_token}`,
-          },
-          body: JSON.stringify({
-            _id: id,
-            approved: true,
-          }),
-        }
-      );
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.message);
-      }
-      toast.success(data.message);
+      const response: any = await updateProduct({
+        _id: id,
+        approved: true,
+      }).unwrap();
+      toast.success(response.message);
       fetchUnapprovedProductsHandler();
     } catch (err: any) {
       toast.error(err?.message || "Something went wrong");
-    } finally {
-      setIsLoadingProducts(false);
     }
   };
 
@@ -91,12 +102,208 @@ const Approvals: React.FC = () => {
     }
   };
 
+  // For Unapproved Stores
+  const fetchUnapprovedStoresHandler = async () => {
+    try {
+      setIsLoadingStores(true);
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "store/unapproved",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setStores(data.unapproved);
+      setFilteredStores(data.unapproved);
+    } catch (err: any) {
+      toast.error(err?.message || "Something went wrong");
+    } finally {
+      setIsLoadingStores(false);
+    }
+  };
+
+  const approveStoreHandler = async (id: string) => {
+    try {
+      const response = await updateStore({ _id: id, approved: true }).unwrap();
+      toast.success(response.message);
+      fetchUnapprovedStoresHandler();
+    } catch (err: any) {
+      toast.error(err?.message || "Something went wrong");
+    }
+  };
+
+  const deleteStoreHandler = async (id: string) => {
+    try {
+      const response: any = await deleteStore(id).unwrap();
+      toast.success(response.message);
+      fetchUnapprovedStoresHandler();
+    } catch (err: any) {
+      toast.error(err?.data?.message || err?.message || "Something went wrong");
+    }
+  };
+
+  // For Unapproved Buyers And Sellers
+  const fetchUnapprovedBuyersHandler = async () => {
+    try {
+      setIsLoadingBuyers(true);
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "agent/unapproved-buyers",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setBuyers(data.agents);
+      setFilteredBuyers(data.agents);
+    } catch (err: any) {
+      toast.error(err?.message || "Something went wrong");
+    } finally {
+      setIsLoadingBuyers(false);
+    }
+  };
+
+  const approveAgentHandler = async (id: string) => {
+    try {
+      const response = await updateAgent({ _id: id, approved: true }).unwrap();
+      toast.success(response.message);
+      fetchUnapprovedBuyersHandler();
+    } catch (err: any) {
+      toast.error(err?.message || "Something went wrong");
+    }
+  };
+
+  const deleteAgentHandler = async (id: string) => {
+    try {
+      const response: any = await deleteAgent(id).unwrap();
+      toast.success(response.message);
+      fetchUnapprovedBuyersHandler();
+    } catch (err: any) {
+      toast.error(err?.data?.message || err?.message || "Something went wrong");
+    }
+  };
+
   useEffect(() => {
     fetchUnapprovedProductsHandler();
+    fetchUnapprovedStoresHandler();
+    fetchUnapprovedBuyersHandler();
   }, []);
+
+  // Product Search
+  useEffect(() => {
+    const searchTxt = productSearchKey?.toLowerCase();
+    const results = products.filter(
+      (prod: any) =>
+        prod.name?.toLowerCase()?.includes(searchTxt) ||
+        prod.product_id?.toLowerCase()?.includes(searchTxt) ||
+        prod.category?.toLowerCase()?.includes(searchTxt) ||
+        prod.price?.toString()?.toLowerCase()?.toString().includes(searchTxt) ||
+        prod.uom?.toLowerCase()?.includes(searchTxt) ||
+        prod.current_stock?.toString().toString().includes(searchTxt) ||
+        prod?.min_stock?.toString()?.includes(searchTxt) ||
+        prod?.max_stock?.toString()?.includes(searchTxt) ||
+        prod?.hsn?.includes(searchTxt) ||
+        (prod?.createdAt &&
+          new Date(prod?.createdAt)
+            ?.toISOString()
+            ?.substring(0, 10)
+            ?.split("-")
+            .reverse()
+            .join("")
+            ?.includes(searchTxt?.replaceAll("/", "") || "")) ||
+        (prod?.updatedAt &&
+          new Date(prod?.updatedAt)
+            ?.toISOString()
+            ?.substring(0, 10)
+            ?.split("-")
+            ?.reverse()
+            ?.join("")
+            ?.includes(searchTxt?.replaceAll("/", "") || ""))
+    );
+    setFilteredStores(results);
+  }, [productSearchKey]);
+
+  // Store Search
+  useEffect(() => {
+    const searchTxt = storeSearchKey?.toLowerCase();
+    const results = stores.filter(
+      (st: any) =>
+        st.name?.toLowerCase()?.includes(searchTxt) ||
+        st.gst_number?.toLowerCase()?.includes(searchTxt) ||
+        st.address_line1
+          ?.toString()
+          ?.toLowerCase()
+          ?.toString()
+          .includes(searchTxt) ||
+        st.address_line2?.toLowerCase()?.includes(searchTxt) ||
+        st.pincode?.toString().toString().includes(searchTxt) ||
+        st?.city?.toString()?.includes(searchTxt) ||
+        st?.state?.toString()?.includes(searchTxt) ||
+        (st?.createdAt &&
+          new Date(st?.createdAt)
+            ?.toISOString()
+            ?.substring(0, 10)
+            ?.split("-")
+            .reverse()
+            .join("")
+            ?.includes(searchTxt?.replaceAll("/", "") || "")) ||
+        (st?.updatedAt &&
+          new Date(st?.updatedAt)
+            ?.toISOString()
+            ?.substring(0, 10)
+            ?.split("-")
+            ?.reverse()
+            ?.join("")
+            ?.includes(searchTxt?.replaceAll("/", "") || ""))
+    );
+    setFilteredStores(results);
+  }, [storeSearchKey]);
+
+  // Buyer Search
+  useEffect(() => {
+    const searchTxt = buyerSearchKey?.toLowerCase();
+    const results = buyers.filter(
+      (buyer: any) =>
+        buyer.name?.toLowerCase()?.includes(searchTxt) ||
+        buyer.email?.toLowerCase()?.includes(searchTxt) ||
+        buyer.phone?.toLowerCase()?.includes(searchTxt) ||
+        buyer?.gst_number?.toLowerCase()?.includes(searchTxt) ||
+        buyer.company_name.toLowerCase().includes(searchTxt) ||
+        buyer.company_email.toLowerCase().includes(searchTxt) ||
+        buyer.company_phone.toLowerCase().includes(searchTxt) ||
+        buyer.address_line1.toLowerCase().includes(searchTxt) ||
+        buyer?.address_line2?.toLowerCase()?.includes(searchTxt) ||
+        buyer?.pincode?.toLowerCase()?.includes(searchTxt) ||
+        buyer.city.toLowerCase().includes(searchTxt) ||
+        buyer.state.toLowerCase().includes(searchTxt) ||
+        (buyer?.createdAt &&
+          new Date(buyer?.createdAt)
+            ?.toISOString()
+            ?.substring(0, 10)
+            ?.split("-")
+            .reverse()
+            .join("")
+            ?.includes(searchTxt?.replaceAll("/", "") || "")) ||
+        (buyer?.updatedAt &&
+          new Date(buyer?.updatedAt)
+            ?.toISOString()
+            ?.substring(0, 10)
+            ?.split("-")
+            ?.reverse()
+            ?.join("")
+            ?.includes(searchTxt?.replaceAll("/", "") || ""))
+    );
+    setFilteredBuyers(results);
+  }, [buyerSearchKey]);
 
   return (
     <div>
+      {/* PRODUCTS */}
       <div>
         {/* Products Page */}
         <div className="flex flex-col items-start justify-start md:flex-row gap-y-1 md:justify-between md:items-center mb-8">
@@ -110,8 +317,8 @@ const Approvals: React.FC = () => {
               rows={1}
               //   width="220px"
               placeholder="Search"
-              //   value={searchKey}
-              //   onChange={(e) => setSearchKey(e.target.value)}
+              value={productSearchKey}
+              onChange={(e) => setProductSearchKey(e.target.value)}
             />
             <Button
               fontSize={{ base: "14px", md: "14px" }}
@@ -135,6 +342,92 @@ const Approvals: React.FC = () => {
             products={filteredProducts}
             deleteProductHandler={deleteProductHandler}
             approveProductHandler={approveProductHandler}
+          />
+        </div>
+      </div>
+
+      {/* STORES */}
+      <div className="mt-10">
+        {/* Stores Page */}
+        <div className="flex flex-col items-start justify-start md:flex-row gap-y-1 md:justify-between md:items-center mb-8">
+          <div className="flex text-lg md:text-xl font-semibold items-center gap-y-1">
+            Stores for Approval
+          </div>
+
+          <div className="mt-2 md:mt-0 flex flex-wrap gap-y-1 gap-x-2 w-full md:w-fit">
+            <textarea
+              className="rounded-[10px] w-full md:flex-1 px-2 py-2 md:px-3 md:py-2 text-sm focus:outline-[#1640d6] hover:outline:[#1640d6] border resize-none border-[#bbbbbb] bg-[#bdbdbdd9]"
+              rows={1}
+              //   width="220px"
+              placeholder="Search"
+              value={storeSearchKey}
+              onChange={(e) => setStoreSearchKey(e.target.value)}
+            />
+            <Button
+              fontSize={{ base: "14px", md: "14px" }}
+              paddingX={{ base: "10px", md: "12px" }}
+              paddingY={{ base: "0", md: "3px" }}
+              width={{ base: "-webkit-fill-available", md: 100 }}
+              onClick={fetchUnapprovedStoresHandler}
+              leftIcon={<MdOutlineRefresh />}
+              color="#1640d6"
+              borderColor="#1640d6"
+              variant="outline"
+            >
+              Refresh
+            </Button>
+          </div>
+        </div>
+
+        <div>
+          <StoreTable
+            isLoadingStores={isLoadingStores}
+            stores={filteredStores}
+            deleteStoreHandler={deleteStoreHandler}
+            approveStoreHandler={approveStoreHandler}
+          />
+        </div>
+      </div>
+
+      {/* BUYERS */}
+      <div className="mt-10">
+        {/* Buyers Page */}
+        <div className="flex flex-col items-start justify-start md:flex-row gap-y-1 md:justify-between md:items-center mb-8">
+          <div className="flex text-lg md:text-xl font-semibold items-center gap-y-1">
+            Buyers for Approval
+          </div>
+
+          <div className="mt-2 md:mt-0 flex flex-wrap gap-y-1 gap-x-2 w-full md:w-fit">
+            <textarea
+              className="rounded-[10px] w-full md:flex-1 px-2 py-2 md:px-3 md:py-2 text-sm focus:outline-[#1640d6] hover:outline:[#1640d6] border resize-none border-[#bbbbbb] bg-[#bdbdbdd9]"
+              rows={1}
+              //   width="220px"
+              placeholder="Search"
+              value={buyerSearchKey}
+              onChange={(e) => setBuyerSearchKey(e.target.value)}
+            />
+            <Button
+              fontSize={{ base: "14px", md: "14px" }}
+              paddingX={{ base: "10px", md: "12px" }}
+              paddingY={{ base: "0", md: "3px" }}
+              width={{ base: "-webkit-fill-available", md: 100 }}
+              onClick={fetchUnapprovedBuyersHandler}
+              leftIcon={<MdOutlineRefresh />}
+              color="#1640d6"
+              borderColor="#1640d6"
+              variant="outline"
+            >
+              Refresh
+            </Button>
+          </div>
+        </div>
+
+        <div>
+          <BuyerTable
+            isLoadingBuyers={isLoadingBuyers}
+            buyers={filteredBuyers}
+            deleteBuyerHandler={deleteAgentHandler}
+            approveBuyerHandler={approveAgentHandler}
           />
         </div>
       </div>

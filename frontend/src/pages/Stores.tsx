@@ -2,21 +2,26 @@ import { Button } from "@chakra-ui/react";
 import { MdOutlineRefresh } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  closeAddProductDrawer,
+  closeAddStoreDrawer,
   closeStoreDetailsDrawer,
-  closeUpdateProductDrawer,
-  openAddProductDrawer,
+  closeUpdateStoreDrawer,
+  openAddStoreDrawer,
   openStoreDetailsDrawer,
-  openUpdateProductDrawer,
+  openUpdateStoreDrawer,
 } from "../redux/reducers/drawersSlice";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import StoreTable from "../components/Table/StoreTable";
 import AddStore from "../components/Drawers/Store/AddStore";
+import StoreDetails from "../components/Drawers/Store/StoreDetails";
+import UpdateStore from "../components/Drawers/Store/UpdateStore";
+import { useDeleteStoresMutation } from "../redux/api/api";
 
 const Stores: React.FC = () => {
   const [isLoadingStores, setIsLoadingStores] = useState<boolean>(false);
+  const [searchKey, setSearchKey] = useState<string | undefined>();
+  const [storeId, setStoreId] = useState<string | undefined>(); // Store Id to be updated or deleted
   const [stores, setStores] = useState<any>([]);
   const [filteredStores, setFilteredStores] = useState<any>([]);
   const {
@@ -27,23 +32,27 @@ const Stores: React.FC = () => {
   const dispatch = useDispatch();
   const [cookies] = useCookies();
 
+  const [deleteStore] = useDeleteStoresMutation();
+
   const openAddStoreDrawerHandler = () => {
-    dispatch(openAddProductDrawer());
+    dispatch(openAddStoreDrawer());
   };
 
   const closeAddStoreDrawerHandler = () => {
-    dispatch(closeAddProductDrawer());
+    dispatch(closeAddStoreDrawer());
   };
 
-  const openUpdateStoreDrawerHandler = () => {
-    dispatch(openUpdateProductDrawer());
+  const openUpdateStoreDrawerHandler = (id: string) => {
+    setStoreId(id);
+    dispatch(openUpdateStoreDrawer());
   };
 
   const closeUpdateStoreDrawerHandler = () => {
-    dispatch(closeUpdateProductDrawer());
+    dispatch(closeUpdateStoreDrawer());
   };
 
-  const openStoreDetailsDrawerHandler = () => {
+  const openStoreDetailsDrawerHandler = (id: string) => {
+    setStoreId(id);
     dispatch(openStoreDetailsDrawer());
   };
 
@@ -71,8 +80,18 @@ const Stores: React.FC = () => {
       setFilteredStores(data.stores);
     } catch (err: any) {
       toast.error(err?.data?.message || err?.message || "Something went wrong");
-    } finally{
+    } finally {
       setIsLoadingStores(false);
+    }
+  };
+
+  const deleteStoreHandler = async (id: string) => {
+    try {
+      const response = await deleteStore(id).unwrap();
+      toast.success(response.message);
+      fetchStoresHandler();
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
     }
   };
 
@@ -80,13 +99,61 @@ const Stores: React.FC = () => {
     fetchStoresHandler();
   }, []);
 
+  useEffect(() => {
+    const searchTxt = searchKey?.toLowerCase();
+    const results = stores.filter((st: any) => (
+        st.name?.toLowerCase()?.includes(searchTxt) ||
+        st.gst_number?.toLowerCase()?.includes(searchTxt) ||
+        st.address_line1?.toString()?.toLowerCase()?.toString().includes(searchTxt) ||
+        st.address_line2?.toLowerCase()?.includes(searchTxt) ||
+        st.pincode?.toString().toString().includes(searchTxt) ||
+        st?.city?.toString()?.includes(searchTxt) ||
+        st?.state?.toString()?.includes(searchTxt) ||
+        (st?.createdAt &&
+          new Date(st?.createdAt)
+            ?.toISOString()
+            ?.substring(0, 10)
+            ?.split("-")
+            .reverse()
+            .join("")
+            ?.includes(searchTxt?.replaceAll("/", "") || "")) ||
+        (st?.updatedAt &&
+          new Date(st?.updatedAt)
+            ?.toISOString()
+            ?.substring(0, 10)
+            ?.split("-")
+            ?.reverse()
+            ?.join("")
+            ?.includes(searchTxt?.replaceAll("/", "") || ""))
+      ));
+    setFilteredStores(results);
+  }, [searchKey]);
+
   return (
     <div>
       <div>
         {/* Add Store Drawer */}
-        {isAddStoreDrawerOpened && <AddStore />}
+        {isAddStoreDrawerOpened && (
+          <AddStore
+            fetchStoresHandler={fetchStoresHandler}
+            closeDrawerHandler={closeAddStoreDrawerHandler}
+          />
+        )}
         {/* Update Store Drawer */}
+        {isUpdateStoreDrawerOpened && (
+          <UpdateStore
+            storeId={storeId}
+            fetchStoresHandler={fetchStoresHandler}
+            closeDrawerHandler={closeUpdateStoreDrawerHandler}
+          />
+        )}
         {/* Store Details Drawer */}
+        {isStoreDetailsDrawerOpened && (
+          <StoreDetails
+            storeId={storeId}
+            closeDrawerHandler={closeStoreDetailsDrawerHandler}
+          />
+        )}
         {/* Stores Page */}
         <div className="flex flex-col items-start justify-start md:flex-row gap-y-1 md:justify-between md:items-center mb-8">
           <div className="flex text-lg md:text-xl font-semibold items-center gap-y-1">
@@ -99,8 +166,8 @@ const Stores: React.FC = () => {
               rows={1}
               //   width="220px"
               placeholder="Search"
-              //   value={searchKey}
-              //   onChange={(e) => setSearchKey(e.target.value)}
+                value={searchKey}
+                onChange={(e) => setSearchKey(e.target.value)}
             />
             <Button
               fontSize={{ base: "14px", md: "14px" }}
@@ -130,7 +197,13 @@ const Stores: React.FC = () => {
         </div>
 
         <div>
-          <StoreTable stores={filteredStores} isLoadingStores={isLoadingStores} />
+          <StoreTable
+            stores={filteredStores}
+            isLoadingStores={isLoadingStores}
+            deleteStoreHandler={deleteStoreHandler}
+            openStoreDetailsDrawerHandler={openStoreDetailsDrawerHandler}
+            openUpdateStoreDrawerHandler={openUpdateStoreDrawerHandler}
+          />
         </div>
       </div>
     </div>

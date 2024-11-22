@@ -41,6 +41,10 @@ const storeSchema = new Schema(
       minlength: [2, "State should be atleast 10 characters long"],
       maxlength: [100, "State cannot exceed 500 characters"],
     },
+    approved: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true,

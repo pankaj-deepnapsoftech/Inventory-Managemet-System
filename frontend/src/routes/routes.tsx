@@ -25,13 +25,6 @@ const routes = [
     isSublink: false
   },
   {
-    name: "Approval",
-    icon: <FaRegCheckCircle />,
-    path: "approval",
-    element: <Approvals />,
-    isSublink: false
-  },
-  {
     name: "Store",
     icon: <IoStorefrontOutline />,
     path: "store",
@@ -39,19 +32,27 @@ const routes = [
     isSublink: false
   },
   {
+    name: "Approval",
+    icon: <FaRegCheckCircle />,
+    path: "approval",
+    element: <Approvals />,
+    isSublink: false
+  },
+  {
     name: "Agent",
+    path: "agent",
     icon: <TbUsersGroup />,
     sublink: [
       {
         name: "Buyer",
         icon: <MdOutlineAttachMoney />,
-        path: "agent/buyer",
+        path: "buyer",
         element: <Buyers />,
       },
       {
         name: "Seller",
         icon: <MdOutlineSell />,
-        path: "agent/seller",
+        path: "seller",
         element: <Sellers />,
       },
     ],

@@ -46,7 +46,7 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
       setGotOtp(true);
       toast.success(data.message);
     } catch (err: any) {
-      toast.error(err?.data?.msg || err?.message || "Something went wrong");
+      toast.error(err?.data?.message || err?.message || "Something went wrong");
     } finally{
       setIsForgetPasswordLoading(false);
     }
@@ -64,7 +64,7 @@ const ForgetPasswordComponent: React.FC<ForgetPasswordComponentProps> = ({
       toast.success(data.message);
       navigate(0);
     } catch (err: any) {
-      toast.error(err?.data?.msg || err?.message || "Something went wrong");
+      toast.error(err?.data?.message || err?.message || "Something went wrong");
     } finally{
       setIsResetPasswordLoading(false);
     }

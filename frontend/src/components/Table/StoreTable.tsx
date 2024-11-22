@@ -93,11 +93,11 @@ const StoreTable: React.FC<StoreTableProps> = ({
         accessor: "state",
       },
       {
-        Header: "Created At",
+        Header: "Created On",
         accessor: "createdAt",
       },
       {
-        Header: "Updated At",
+        Header: "Last Updated",
         accessor: "updatedAt",
       },
     ],
@@ -217,7 +217,7 @@ const StoreTable: React.FC<StoreTableProps> = ({
                     {row.cells.map((cell: Cell) => {
                       return (
                         <Td fontWeight="500" {...cell.getCellProps()}>
-                          {cell.render("Cell")}
+                          {cell.column.id !== 'createdAt' && cell.column.id !== 'updatedAt' && cell.render("Cell")}
 
                           {cell.column.id === "createdAt" &&
                             row.original?.createdAt && (
@@ -228,7 +228,7 @@ const StoreTable: React.FC<StoreTableProps> = ({
                               </span>
                             )}
                           {cell.column.id === "updatedAt" &&
-                            row.original?.followup_date && (
+                            row.original?.updatedAt && (
                               <span>
                                 {moment(row.original?.updatedAt).format(
                                   "DD/MM/YYYY"

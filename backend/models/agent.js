@@ -6,7 +6,7 @@ const agentSchema = new Schema({
         type: String,
         required: [true, 'Agent Type is a required field'],
         enum: {
-            values: ['buyer', 'supplier', 'both'],
+            values: ['buyer', 'seller', 'both'],
             message: "Agent Type should be one of the following: buyer, supplier"
         }
     },
@@ -77,6 +77,10 @@ const agentSchema = new Schema({
         minlength: [2, "State should be atleast 10 characters long"],
         maxlength: [100, "State cannot exceed 500 characters"]
     },
+    approved: {
+        type: Boolean,
+        default: false
+    }
 }, {
     timestamps: true
 });

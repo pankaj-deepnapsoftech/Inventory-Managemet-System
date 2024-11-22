@@ -1,7 +1,7 @@
 import { BiLockAlt, BiUser } from "react-icons/bi";
 import { FaStarOfLife } from "react-icons/fa";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLazyLoginWithTokenQuery, useLoginMutation } from "../../redux/api/api";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
@@ -29,6 +29,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
   setShowOTPVerificationComponent,
 }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [cookies, setCookie, removeCookie] = useCookies();
 
@@ -46,8 +47,9 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
       dispatch(userExists(data.user));
       setCookie('access_token', data.token, {maxAge: 86400});
       toast.success(data.message);
+      navigate('/');
     } catch (err: any) {
-      toast.error(err?.data?.msg || err?.message || "Something went wrong");
+      toast.error(err?.data?.message || err?.message || "Something went wrong");
     } finally{
       setIsLoginLoading(false);
     }

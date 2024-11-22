@@ -64,7 +64,7 @@ exports.details = TryCatch(async (req, res)=>{
     })
 });
 exports.all = TryCatch(async (req, res)=>{
-    const products = await Product.find({approved: true});
+    const products = await Product.find({approved: true}).sort({'updatedAt': -1});
     res.status(200).json({
         status: 200,
         success: true,
@@ -72,7 +72,7 @@ exports.all = TryCatch(async (req, res)=>{
     })
 })
 exports.unapproved = TryCatch(async (req, res)=>{
-    const unapprovedProducts = await Product.find({approved: false});
+    const unapprovedProducts = await Product.find({approved: false}).sort({'updatedAt': -1});
     res.status(200).json({
         status: 200,
         success: true,

@@ -42,7 +42,7 @@ const OTPVerificationComponent: React.FC<OTPVerificationComponentProps> = ({
       toast.success(data.message);
       navigate("/login");
     } catch (err: any) {
-      toast.error(err?.data?.msg || err?.message || "Something went wrong");
+      toast.error(err?.data?.message || err?.message || "Something went wrong");
     } finally {
       setIsVerifyingOTP(false);
     }
@@ -55,7 +55,7 @@ const OTPVerificationComponent: React.FC<OTPVerificationComponentProps> = ({
       setCanResend(false);
       setSecondsLeft(30);
     } catch (err: any) {
-      toast.error(err?.data?.msg || err?.message || "Something went wrong");
+      toast.error(err?.data?.message || err?.message || "Something went wrong");
     } finally {
       setIsResendingOTP(false);
     }

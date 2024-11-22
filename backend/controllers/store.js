@@ -30,7 +30,7 @@ exports.update = TryCatch(async (req, res)=>{
         throw new ErrorHandler("Store doesn't exist", 400);
     }
 
-    store = await Store.findByIdAndUpdate(id, {...storeDetails}, {new: true});
+    store = await Store.findByIdAndUpdate(id, {...storeDetails, approved: req.user.isSuper ? storeDetails?.approved : false}, {new: true});
 
     res.status(200).json({
         status: 200,
@@ -75,10 +75,18 @@ exports.details = TryCatch(async (req, res)=>{
     })
 })
 exports.all = TryCatch(async (req, res)=>{
-    const stores = await Store.find({});
+    const stores = await Store.find({approved: true}).sort({'updatedAt': -1});
     res.status(200).json({
         status: 200,
         success: true,
         stores
+    })
+})
+exports.unapproved = TryCatch(async (req, res)=>{
+    const stores = await Store.find({approved: false}).sort({'updatedAt': -1});
+    res.status(200).json({
+        status: 200,
+        success: true,
+        unapproved: stores
     })
 })

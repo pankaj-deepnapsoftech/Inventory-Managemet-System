@@ -22,7 +22,7 @@ const Navigation: React.FC = () => {
                 </li>
                 {route.sublink &&
                   route.sublink.map((sublink, index) => (
-                    <NavLink to={sublink.path}>
+                    <NavLink to={route.path + '/' + sublink.path}>
                       <li
                         key={index}
                         className="flex gap-x-2 pl-5 pr-9 py-3 rounded-lg hover:bg-[#e6efff] hover:text-[#1640d6] hover:cursor-pointer text-[15px] font-semibold"

@@ -123,18 +123,33 @@ const Products: React.FC = () => {
 
   useEffect(()=>{
     const searchTxt = searchKey?.toLowerCase();
-    const results = data.filter((prod: any) => {console.log(prod); return (
-      prod.name.includes(searchTxt) ||
-      prod.product_id.includes(searchTxt) ||
-      prod.category.includes(searchTxt) ||
-      prod.price.toString().includes(searchTxt) ||
-      prod.uom.includes(searchTxt) ||
-      prod.current_stock.toString().includes(searchTxt) ||
+    const results = data.filter((prod: any) => (
+      prod.name?.toLowerCase()?.includes(searchTxt) ||
+      prod.product_id?.toLowerCase()?.includes(searchTxt) ||
+      prod.category?.toLowerCase()?.includes(searchTxt) ||
+      prod.price?.toString()?.toLowerCase()?.toString().includes(searchTxt) ||
+      prod.uom?.toLowerCase()?.includes(searchTxt) ||
+      prod.current_stock?.toString().toString().includes(searchTxt) ||
       prod?.min_stock?.toString()?.includes(searchTxt) ||
       prod?.max_stock?.toString()?.includes(searchTxt) ||
-      prod?.hsn?.includes(searchTxt)
-    )});
-    // console.log(searchTxt, results)
+      prod?.hsn?.includes(searchTxt) ||
+      (prod?.createdAt &&
+        new Date(prod?.createdAt)
+          ?.toISOString()
+          ?.substring(0, 10)
+          ?.split("-")
+          .reverse()
+          .join("")
+          ?.includes(searchTxt?.replaceAll("/", "") || '')) ||
+      (prod?.updatedAt &&
+        new Date(prod?.updatedAt)
+          ?.toISOString()
+          ?.substring(0, 10)
+          ?.split("-")
+          ?.reverse()
+          ?.join("")
+          ?.includes(searchTxt?.replaceAll("/", "") || ''))
+    ));
     setFilteredData(results);
   }, [searchKey])
 

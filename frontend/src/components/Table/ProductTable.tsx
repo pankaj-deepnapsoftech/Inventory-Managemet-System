@@ -64,6 +64,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
     min_stock?: number;
     max_stock?: number;
     hsn_code?: number;
+    createdAt: string;
+    updatedAt: string;
   }>[] = useMemo(
     () => [
       {
@@ -97,6 +99,14 @@ const ProductTable: React.FC<ProductTableProps> = ({
       {
         Header: "Max stock",
         accessor: "max_stock",
+      },
+      {
+        Header: "Created On",
+        accessor: "createdAt",
+      },
+      {
+        Header: "Last Updated",
+        accessor: "updatedAt",
       },
     ],
     []
@@ -215,9 +225,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     {row.cells.map((cell: Cell) => {
                       return (
                         <Td fontWeight="500" {...cell.getCellProps()}>
-                          {cell.render("Cell")}
+                          {cell.column.id !== 'createdAt' && cell.column.id !== 'updatedAt' && cell.render("Cell")}
 
-                          {cell.column.id === "created_on" &&
+                          {cell.column.id === "createdAt" &&
                             row.original?.createdAt && (
                               <span>
                                 {moment(row.original?.createdAt).format(
@@ -226,7 +236,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                               </span>
                             )}
                           {cell.column.id === "updatedAt" &&
-                            row.original?.followup_date && (
+                            row.original?.updatedAt && (
                               <span>
                                 {moment(row.original?.updatedAt).format(
                                   "DD/MM/YYYY"

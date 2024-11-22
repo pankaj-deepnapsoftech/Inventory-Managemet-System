@@ -19,17 +19,20 @@ const App: React.FC = () => {
           <Route path="/" element={<Layout />}>
             {routes.map((route, ind) => {
               if (route.isSublink) {
-                {route.sublink &&
-                    route.sublink.map((sublink, index) => {
-                      return (
-                        <Route
-                          key={index}
-                          path={sublink.path}
-                          element={sublink.element}
-                        ></Route>
-                      );
-                    });
-                }
+                return (
+                  <Route key={ind} path={route.path} element={route.element}>
+                    {route.sublink &&
+                      route.sublink.map((sublink, index) => {
+                        return (
+                          <Route
+                            key={index}
+                            path={sublink.path}
+                            element={sublink.element}
+                          ></Route>
+                        );
+                      })}
+                  </Route>
+                );
               } else {
                 return (
                   <Route
