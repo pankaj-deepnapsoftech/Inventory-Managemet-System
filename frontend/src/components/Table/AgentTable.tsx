@@ -15,8 +15,8 @@ import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import moment from "moment";
 import { MdDeleteOutline, MdEdit, MdOutlineVisibility } from "react-icons/md";
 
-interface BuyerTableProps {
-  buyers: Array<{
+interface AgentTableProps {
+  agents: Array<{
     name: string;
     email: string;
     phone: string;
@@ -32,20 +32,20 @@ interface BuyerTableProps {
     createdAt: string;
     updatedAt: string;
   }>;
-  isLoadingBuyers: boolean;
-  openUpdateBuyerDrawerHandler?: (id: string) => void;
-  openBuyerDetailsDrawerHandler?: (id: string) => void;
-  deleteBuyerHandler?: (id: string) => void;
-  approveBuyerHandler?: (id: string) => void;
+  isLoadingAgents: boolean;
+  openUpdateAgentDrawerHandler?: (id: string) => void;
+  openAgentDetailsDrawerHandler?: (id: string) => void;
+  deleteAgentHandler?: (id: string) => void;
+  approveAgentHandler?: (id: string) => void;
 }
 
-const BuyerTable: React.FC<BuyerTableProps> = ({
-  buyers,
-  isLoadingBuyers,
-  openUpdateBuyerDrawerHandler,
-  openBuyerDetailsDrawerHandler,
-  deleteBuyerHandler,
-  approveBuyerHandler,
+const AgentTable: React.FC<AgentTableProps> = ({
+  agents,
+  isLoadingAgents,
+  openUpdateAgentDrawerHandler,
+  openAgentDetailsDrawerHandler,
+  deleteAgentHandler,
+  approveAgentHandler,
 }) => {
   const columns = useMemo(
     () => [
@@ -92,7 +92,7 @@ const BuyerTable: React.FC<BuyerTableProps> = ({
   }> = useTable(
     {
       columns,
-      data: buyers,
+      data: agents,
       initialState: { pageIndex: 0 },
     },
     useSortBy,
@@ -100,14 +100,14 @@ const BuyerTable: React.FC<BuyerTableProps> = ({
   );
 
   return  <div>
-  {isLoadingBuyers && <Loading />}
-  {buyers.length === 0 && !isLoadingBuyers && (
+  {isLoadingAgents && <Loading />}
+  {agents.length === 0 && !isLoadingAgents && (
     <div className="mx-auto w-max">
       <FcDatabase size={100} />
       <p className="text-lg">No Data Found</p>
     </div>
   )}
-  {!isLoadingBuyers && buyers.length > 0 && (
+  {!isLoadingAgents && agents.length > 0 && (
     <TableContainer>
       <Table variant="simple" {...getTableProps()}>
         <Thead className="text-sm font-semibold">
@@ -211,39 +211,39 @@ const BuyerTable: React.FC<BuyerTableProps> = ({
                   );
                 })}
                 <Td className="flex gap-x-2">
-                  {openBuyerDetailsDrawerHandler && (
+                  {openAgentDetailsDrawerHandler && (
                     <MdOutlineVisibility
                       className="hover:scale-110"
                       size={16}
                       onClick={() =>
-                        openBuyerDetailsDrawerHandler(row.original?._id)
+                        openAgentDetailsDrawerHandler(row.original?._id)
                       }
                     />
                   )}
-                  {openUpdateBuyerDrawerHandler && (
+                  {openUpdateAgentDrawerHandler && (
                     <MdEdit
                       className="hover:scale-110"
                       size={16}
                       onClick={() =>
-                        openUpdateBuyerDrawerHandler(row.original?._id)
+                        openUpdateAgentDrawerHandler(row.original?._id)
                       }
                     />
                   )}
-                  {deleteBuyerHandler && (
+                  {deleteAgentHandler && (
                     <MdDeleteOutline
                       className="hover:scale-110"
                       size={16}
                       onClick={() =>
-                        deleteBuyerHandler(row.original?._id)
+                        deleteAgentHandler(row.original?._id)
                       }
                     />
                   )}
-                  {approveBuyerHandler && (
+                  {approveAgentHandler && (
                     <FcApproval
                       className="hover:scale-110"
                       size={16}
                       onClick={() =>
-                        approveBuyerHandler(row.original?._id)
+                        approveAgentHandler(row.original?._id)
                       }
                     />
                   )}
@@ -258,4 +258,4 @@ const BuyerTable: React.FC<BuyerTableProps> = ({
 </div>
 };
 
-export default BuyerTable;
+export default AgentTable;

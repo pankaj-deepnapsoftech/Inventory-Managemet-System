@@ -16,7 +16,7 @@ import ProductTable from "../components/Table/ProductTable";
 import UpdateProduct from "../components/Drawers/Product/UpdateProduct";
 import { FcDatabase } from "react-icons/fc";
 import StoreTable from "../components/Table/StoreTable";
-import BuyerTable from "../components/Table/BuyerTable";
+import AgentTable from "../components/Table/AgentTable";
 
 const Approvals: React.FC = () => {
   //   const [unapprovedProducts] = useLazyUnapprovedProductsQuery();
@@ -43,11 +43,16 @@ const Approvals: React.FC = () => {
   const [stores, setStores] = useState<any>([]);
   const [filteredStores, setFilteredStores] = useState<any>([]);
   const [isLoadingStores, setIsLoadingStores] = useState<boolean>(false);
-  //  Stores
+  //  Buyer
   const [buyerSearchKey, setBuyerSearchKey] = useState<string | undefined>();
   const [buyers, setBuyers] = useState<any>([]);
   const [filteredBuyers, setFilteredBuyers] = useState<any>([]);
   const [isLoadingBuyers, setIsLoadingBuyers] = useState<boolean>(false);
+  //  Supplier
+  const [sellerSearchKey, setSellerSearchKey] = useState<string | undefined>();
+  const [sellers, setSellers] = useState<any>([]);
+  const [filteredSellers, setFilteredSellers] = useState<any>([]);
+  const [isLoadingSellers, setIsLoadingSellers] = useState<boolean>(false);
 
   const [deleteProduct] = useDeleteProductMutation();
   const [updateProduct] = useUpdateProductMutation();
@@ -168,11 +173,34 @@ const Approvals: React.FC = () => {
     }
   };
 
+  const fetchUnapprovedSellersHandler = async () => {
+    try {
+      setIsLoadingBuyers(true);
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "agent/unapproved-suppliers",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setSellers(data.agents);
+      setFilteredSellers(data.agents);
+    } catch (err: any) {
+      toast.error(err?.message || "Something went wrong");
+    } finally {
+      setIsLoadingBuyers(false);
+    }
+  };
+
   const approveAgentHandler = async (id: string) => {
     try {
       const response = await updateAgent({ _id: id, approved: true }).unwrap();
       toast.success(response.message);
       fetchUnapprovedBuyersHandler();
+      fetchUnapprovedSellersHandler();
     } catch (err: any) {
       toast.error(err?.message || "Something went wrong");
     }
@@ -183,6 +211,7 @@ const Approvals: React.FC = () => {
       const response: any = await deleteAgent(id).unwrap();
       toast.success(response.message);
       fetchUnapprovedBuyersHandler();
+      fetchUnapprovedSellersHandler();
     } catch (err: any) {
       toast.error(err?.data?.message || err?.message || "Something went wrong");
     }
@@ -192,6 +221,7 @@ const Approvals: React.FC = () => {
     fetchUnapprovedProductsHandler();
     fetchUnapprovedStoresHandler();
     fetchUnapprovedBuyersHandler();
+    fetchUnapprovedSellersHandler();
   }, []);
 
   // Product Search
@@ -300,6 +330,43 @@ const Approvals: React.FC = () => {
     );
     setFilteredBuyers(results);
   }, [buyerSearchKey]);
+
+  // Seller Search
+  useEffect(() => {
+    const searchTxt = sellerSearchKey?.toLowerCase();
+    const results = sellers.filter(
+      (seller: any) =>
+        seller.name?.toLowerCase()?.includes(searchTxt) ||
+        seller.email?.toLowerCase()?.includes(searchTxt) ||
+        seller.phone?.toLowerCase()?.includes(searchTxt) ||
+        seller?.gst_number?.toLowerCase()?.includes(searchTxt) ||
+        seller.company_name.toLowerCase().includes(searchTxt) ||
+        seller.company_email.toLowerCase().includes(searchTxt) ||
+        seller.company_phone.toLowerCase().includes(searchTxt) ||
+        seller.address_line1.toLowerCase().includes(searchTxt) ||
+        seller?.address_line2?.toLowerCase()?.includes(searchTxt) ||
+        seller?.pincode?.toLowerCase()?.includes(searchTxt) ||
+        seller.city.toLowerCase().includes(searchTxt) ||
+        seller.state.toLowerCase().includes(searchTxt) ||
+        (seller?.createdAt &&
+          new Date(seller?.createdAt)
+            ?.toISOString()
+            ?.substring(0, 10)
+            ?.split("-")
+            .reverse()
+            .join("")
+            ?.includes(searchTxt?.replaceAll("/", "") || "")) ||
+        (seller?.updatedAt &&
+          new Date(seller?.updatedAt)
+            ?.toISOString()
+            ?.substring(0, 10)
+            ?.split("-")
+            ?.reverse()
+            ?.join("")
+            ?.includes(searchTxt?.replaceAll("/", "") || ""))
+    );
+    setFilteredSellers(results);
+  }, [sellerSearchKey]);
 
   return (
     <div>
@@ -423,11 +490,54 @@ const Approvals: React.FC = () => {
         </div>
 
         <div>
-          <BuyerTable
-            isLoadingBuyers={isLoadingBuyers}
-            buyers={filteredBuyers}
-            deleteBuyerHandler={deleteAgentHandler}
-            approveBuyerHandler={approveAgentHandler}
+          <AgentTable
+            isLoadingAgents={isLoadingBuyers}
+            agents={filteredBuyers}
+            deleteAgentHandler={deleteAgentHandler}
+            approveAgentHandler={approveAgentHandler}
+          />
+        </div>
+      </div>
+
+      {/* SELLERS */}
+      <div className="mt-10">
+        {/* Buyers Page */}
+        <div className="flex flex-col items-start justify-start md:flex-row gap-y-1 md:justify-between md:items-center mb-8">
+          <div className="flex text-lg md:text-xl font-semibold items-center gap-y-1">
+            Suppliers for Approval
+          </div>
+
+          <div className="mt-2 md:mt-0 flex flex-wrap gap-y-1 gap-x-2 w-full md:w-fit">
+            <textarea
+              className="rounded-[10px] w-full md:flex-1 px-2 py-2 md:px-3 md:py-2 text-sm focus:outline-[#1640d6] hover:outline:[#1640d6] border resize-none border-[#bbbbbb] bg-[#bdbdbdd9]"
+              rows={1}
+              //   width="220px"
+              placeholder="Search"
+              value={sellerSearchKey}
+              onChange={(e) => setSellerSearchKey(e.target.value)}
+            />
+            <Button
+              fontSize={{ base: "14px", md: "14px" }}
+              paddingX={{ base: "10px", md: "12px" }}
+              paddingY={{ base: "0", md: "3px" }}
+              width={{ base: "-webkit-fill-available", md: 100 }}
+              onClick={fetchUnapprovedSellersHandler}
+              leftIcon={<MdOutlineRefresh />}
+              color="#1640d6"
+              borderColor="#1640d6"
+              variant="outline"
+            >
+              Refresh
+            </Button>
+          </div>
+        </div>
+
+        <div>
+          <AgentTable
+            isLoadingAgents={isLoadingSellers}
+            agents={filteredSellers}
+            deleteAgentHandler={deleteAgentHandler}
+            approveAgentHandler={approveAgentHandler}
           />
         </div>
       </div>

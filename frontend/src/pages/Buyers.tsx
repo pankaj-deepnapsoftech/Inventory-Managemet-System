@@ -1,6 +1,6 @@
 import { Button, filter } from "@chakra-ui/react";
 import { MdOutlineRefresh } from "react-icons/md";
-import BuyerTable from "../components/Table/BuyerTable";
+import AgentTable from "../components/Table/AgentTable";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -199,12 +199,12 @@ const Buyers: React.FC = () => {
       </div>
 
       <div>
-        <BuyerTable
-          buyers={filteredBuyers}
-          openUpdateBuyerDrawerHandler={openUpdateBuyerDrawerHandler}
-          openBuyerDetailsDrawerHandler={openBuyerDetailsDrawerHandler}
-          isLoadingBuyers={isLoadingBuyers}
-          deleteBuyerHandler={deleteBuyerHandler}
+        <AgentTable
+          agents={filteredBuyers}
+          openUpdateAgentDrawerHandler={openUpdateBuyerDrawerHandler}
+          openAgentDetailsDrawerHandler={openBuyerDetailsDrawerHandler}
+          isLoadingAgents={isLoadingBuyers}
+          deleteAgentHandler={deleteBuyerHandler}
         />
       </div>
     </div>

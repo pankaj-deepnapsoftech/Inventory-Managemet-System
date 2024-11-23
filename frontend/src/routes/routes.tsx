@@ -50,9 +50,9 @@ const routes = [
         element: <Buyers />,
       },
       {
-        name: "Seller",
+        name: "Supplier",
         icon: <MdOutlineSell />,
-        path: "seller",
+        path: "supplier",
         element: <Sellers />,
       },
     ],

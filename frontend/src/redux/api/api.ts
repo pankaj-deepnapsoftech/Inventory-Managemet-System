@@ -211,7 +211,7 @@ const agentApi = createApi({
       providesTags: ["Agent"],
     }),
     fetchSellers: builder.query({
-      query: () => "/sellers",
+      query: () => "/suppliers",
       providesTags: ["Agent"],
     }),
     addAgent: builder.mutation({
@@ -245,7 +245,7 @@ const agentApi = createApi({
       query: (id) => `unapproved/buyers`,
     }),
     unapprovedSellers: builder.query({
-      query: (id) => `unapproved/sellers`,
+      query: (id) => `unapproved/suppliers`,
     }),
   }),
 });

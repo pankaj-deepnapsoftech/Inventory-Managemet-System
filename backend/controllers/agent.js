@@ -75,8 +75,8 @@ exports.allBuyers = TryCatch(async (req, res)=>{
         agents
     })
 })
-exports.allSelllers = TryCatch(async (req, res)=>{
-    const agents = await Agent.find({agent_type: 'seller', approved: true});
+exports.allSuppliers = TryCatch(async (req, res)=>{
+    const agents = await Agent.find({agent_type: 'supplier', approved: true});
     res.status(200).json({
         status: 200,
         success: true,
@@ -91,8 +91,8 @@ exports.unapprovedBuyers = TryCatch(async (req, res)=>{
         agents
     })
 })
-exports.unapprovedSellers = TryCatch(async (req, res)=>{
-    const agents = await Agent.find({agent_type: 'seller', approved: false});
+exports.unapprovedSuppliers = TryCatch(async (req, res)=>{
+    const agents = await Agent.find({agent_type: 'supplier', approved: false});
     res.status(200).json({
         status: 200,
         success: true,
