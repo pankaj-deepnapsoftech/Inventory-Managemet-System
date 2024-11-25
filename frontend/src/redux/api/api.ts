@@ -250,8 +250,60 @@ const agentApi = createApi({
   }),
 });
 
+const bomApi = createApi({
+  reducerPath: "bomApi",
+  baseQuery: fetchBaseQuery({
+    baseUrl: process.env.REACT_APP_BACKEND_URL+'bom',
+    mode: 'cors',
+    prepareHeaders: (headers)=>{
+      const cookies = parseCookies();
+      const token = cookies?.access_token;
+      if(token){
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      return headers;
+    }
+  }),
+  tagTypes: ["BOM"],
+
+  endpoints: (builder)=>({
+    fetchBoms: builder.query({
+      query: ()=>"/all",
+      providesTags: ["BOM"]
+    }),
+    addBom: builder.mutation({
+      query: (data)=>({
+        url: '/',
+        method: "POST",
+        body: data
+      }),
+      invalidatesTags: ["BOM"]
+    }),
+    updateBOM: builder.mutation({
+      query: (data)=>({
+        url: `/${data?._id}`,
+        method: "PUT",
+        body: data
+      }),
+      invalidatesTags: ["BOM"]
+    }),
+    deleteBom: builder.mutation({
+      query: (_id)=>({
+        url: `/${_id}`,
+        method: "DELETE"
+      })
+    }),
+    bomDetails: builder.query({
+      query: (_id)=>`/${_id}`
+    }),
+    unapprovedBoms: builder.query({
+      query: (_id)=> '/unapproved'
+    })
+  })
+});
+
 // export default api;
-export { api, productApi, storeApi, agentApi };
+export { api, productApi, storeApi, agentApi, bomApi };
 
 // Authentication APIs
 export const {
@@ -295,3 +347,13 @@ export const {
   useLazyUnapprovedBuyersQuery,
   useLazyUnapprovedSellersQuery
 } = agentApi;
+
+// BOM APIs
+export const {
+  useLazyFetchBomsQuery,
+  useAddBomMutation,
+  useUpdateBOMMutation,
+  useDeleteBomMutation,
+  useLazyBomDetailsQuery,
+  useLazyUnapprovedBomsQuery
+} = bomApi;

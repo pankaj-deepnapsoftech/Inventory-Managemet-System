@@ -1,6 +1,7 @@
 import { FaRegCheckCircle } from "react-icons/fa";
 import { IoStorefrontOutline } from "react-icons/io5";
 import { MdOutlineShoppingCart, MdOutlineSpeed, MdOutlineSell, MdOutlineAttachMoney } from "react-icons/md";
+import { RiBillLine } from "react-icons/ri";
 import { TbUsersGroup } from "react-icons/tb";
 import Dashboard from "../pages/Dashboard";
 import Products from "../pages/Products";
@@ -8,6 +9,7 @@ import Approvals from "../pages/Approvals";
 import Stores from "../pages/Stores";
 import Buyers from "../pages/Buyers";
 import Sellers from "../pages/Sellers";
+import BOM from "../pages/BOM";
 
 const routes = [
   {
@@ -57,6 +59,13 @@ const routes = [
       },
     ],
     isSublink: true
+  },
+  {
+    name: "BOM",
+    icon: <RiBillLine />,
+    path: "bom",
+    element: <BOM />,
+    isSublink: false
   },
 ];
 
