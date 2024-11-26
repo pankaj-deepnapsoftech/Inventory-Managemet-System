@@ -3,14 +3,14 @@ const BOMFinishedMaterial = require("../models/bom-finished-material");
 const BOMRawMaterial = require("../models/bom-raw-material");
 const { TryCatch, ErrorHandler } = require("../utils/error");
 
-exports.create = (async (req, res) => {
+exports.create = TryCatch(async (req, res) => {
   const {
     raw_materials,
     processes,
     finished_good,
     approved_by,
     approval_date,
-    product_name,
+    bom_name,
     parts_count,
     total_cost,
   } = req.body;
@@ -18,13 +18,11 @@ exports.create = (async (req, res) => {
   if (
     !raw_materials ||
     raw_materials.length === 0 ||
-    raw_materials.length < 1 ||
     !finished_good ||
-    finished_good.length === 0 ||
-    !product_name ||
-    product_name.trim().length === 0 ||
-    !parts_count ||
-    !total_cost
+    !bom_name ||
+    bom_name.trim().length === 0 ||
+    total_cost === undefined ||
+    total_cost === undefined
   ) {
     throw new ErrorHandler("Please provide all the fields", 400);
   }
@@ -70,7 +68,7 @@ exports.create = (async (req, res) => {
     finished_good: createdFinishedGood._id,
     approved_by,
     approval_date,
-    product_name,
+    bom_name,
     parts_count,
     total_cost,
   });
@@ -93,6 +91,8 @@ exports.update = TryCatch(async (req, res) => {
         throw new ErrorHandler("BOM not found", 400);
     }
 
+    console.log(id, bomDetails)
+
     const updatedBom = await BOM.findByIdAndUpdate(id, {...bomDetails}, {new: true});
 
     res.status(200).json({
@@ -111,6 +111,13 @@ exports.remove = TryCatch(async (req, res) => {
     if(!bom){
         throw new ErrorHandler('BOM not found', 400);
     }
+
+    const rawMaterials = bom.raw_materials.map(material => material._id);
+    const finishedGood = bom.finished_good._id;
+
+    await BOMRawMaterial.deleteMany({_id: { $in: rawMaterials }});
+    await BOMFinishedMaterial.deleteOne({_id: finishedGood});
+
     await bom.deleteOne();
     res.status(200).json({
         status: 200,
@@ -124,7 +131,12 @@ exports.details = TryCatch(async (req, res) => {
     if(!id){
         throw new ErrorHandler("id not provided", 400);
     }
-    const bom = await BOM.findById(id).populate("finished_good raw_materials");
+    const bom = await BOM.findById(id).populate("finished_good").populate({
+        path: "raw_materials",
+        populate: {
+            path: "supplier"
+        }
+    });
     if(!bom){
         throw new ErrorHandler("BOM not found", 400);
     }

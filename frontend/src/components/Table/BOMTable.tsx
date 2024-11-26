@@ -42,7 +42,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
 }) => {
   const columns = useMemo(
     () => [
-      { Header: "Product Name", accessor: "product_name" },
+      { Header: "BOM Name", accessor: "bom_name" },
       { Header: "Parts Count", accessor: "parts_count" },
       { Header: "Total Cost", accessor: "total_cost" },
       { Header: "Approved On", accessor: "approval_date" },

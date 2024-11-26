@@ -8,6 +8,8 @@ import { useCookies } from "react-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { closeAddBomDrawer, closeBomDetailsDrawer, closeUpdateBomDrawer, openAddBomDrawer, openBomDetailsDrawer, openUpdateBomDrawer } from "../redux/reducers/drawersSlice";
 import AddBom from "../components/Drawers/BOM/AddBom";
+import BomDetails from "../components/Drawers/BOM/BomDetails";
+import UpdateBom from "../components/Drawers/BOM/UpdateBom";
 
 const BOM: React.FC = () => {
   const [cookies] = useCookies();
@@ -72,7 +74,7 @@ const BOM: React.FC = () => {
         toast.success(response?.message);
         fetchBomsHandler();
     } catch (error: any) {
-        toast.error(error?.message || "Something went wrong");
+        toast.error(error?.data?.message || "Something went wrong");
     }
   }
 
@@ -85,6 +87,10 @@ const BOM: React.FC = () => {
 
         {/* Add BOM */}
         {isAddBomDrawerOpened && <AddBom closeDrawerHandler={closeAddBomDrawerHandler} fetchBomsHandler={fetchBomsHandler} />}
+        {/* BOM Details */}
+        {isBomDetailsDrawerOpened && <BomDetails bomId={bomId} closeDrawerHandler={closeBomDetailsDrawerHandler} />}
+        {/* Update BOM */}
+        {isUpdateBomDrawerOpened && <UpdateBom bomId={bomId} closeDrawerHandler={closeUpdateBomDrawerHandler} fetchBomsHandler={fetchBomsHandler} />}
 
 
       <div className="flex flex-col items-start justify-start md:flex-row gap-y-1 md:justify-between md:items-center mb-8">

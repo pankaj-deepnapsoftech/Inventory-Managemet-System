@@ -6,20 +6,26 @@ import Select from "react-select";
 import {
   useAddBomMutation,
   useAddProductMutation,
+  useUpdateBOMMutation,
 } from "../../../redux/api/api";
 import { toast } from "react-toastify";
 import RawMaterial from "../../Dynamic Add Components/RawMaterial";
 import Process from "../../Dynamic Add Components/Process";
+import { useCookies } from "react-cookie";
 
-interface AddBomProps {
+interface UpdateBomProps {
   closeDrawerHandler: () => void;
   fetchBomsHandler: () => void;
+  bomId: string | undefined;
 }
 
-const AddBom: React.FC<AddBomProps> = ({
+const UpdateBom: React.FC<UpdateBomProps> = ({
   closeDrawerHandler,
   fetchBomsHandler,
+  bomId,
 }) => {
+  const [cookies] = useCookies();
+  const [isLoadingBom, setIsLoadingBom] = useState<boolean>(false);
   const [bomName, setBomName] = useState<string | undefined>();
   const [partsCount, setPartsCount] = useState<number>(0);
   const [totalPartsCost, setTotalPartsCost] = useState<number>(0);
@@ -39,7 +45,7 @@ const AddBom: React.FC<AddBomProps> = ({
 
   const [processes, setProcesses] = useState<string[]>([""]);
 
-  const [addBom] = useAddBomMutation();
+  const [updateBom] = useUpdateBOMMutation();
 
   const [rawMaterials, setRawMaterials] = useState<any[]>([
     {
@@ -69,7 +75,7 @@ const AddBom: React.FC<AddBomProps> = ({
     { value: "service", label: "Service" },
   ];
 
-  const addBomHandler = async (e: React.FormEvent) => {
+  const updateBomHandler = async (e: React.FormEvent) => {
     e.preventDefault();
 
     let modeifiedRawMaterials = rawMaterials.map((material) => ({
@@ -82,6 +88,7 @@ const AddBom: React.FC<AddBomProps> = ({
     }));
 
     const body = {
+      _id: bomId,
       raw_materials: modeifiedRawMaterials,
       processes: processes,
       finished_good: {
@@ -101,7 +108,7 @@ const AddBom: React.FC<AddBomProps> = ({
     };
 
     try {
-      const response = await addBom(body).unwrap();
+      const response = await updateBom(body).unwrap();
       toast.success(response?.message);
       fetchBomsHandler();
       closeDrawerHandler();
@@ -109,6 +116,72 @@ const AddBom: React.FC<AddBomProps> = ({
       toast.error(error?.data?.message || "Something went wrong");
     }
   };
+
+  const fetchBomDetails = async () => {
+    try {
+      setIsLoadingBom(true);
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + `bom/${bomId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies?.access_token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message);
+      }
+    //   console.log(data.bom);
+
+      setBomName(data.bom.bom_name);
+      setPartsCount(data.bom.parts_count);
+      setTotalPartsCost(data.bom.total_cost);
+
+      setFinishedGoodId(data.bom.finished_good.item_id);
+      setFinishedGoodName(data.bom.finished_good.item_name);
+      setDescription(data.bom.finished_good.description);
+      setQuantity(data.bom.finished_good.quantity);
+      setCost(data.bom.finished_good.cost);
+      setUom(data.bom.finished_good.uom);
+      setComments(data.bom.finished_good.comments);
+      setCategory({value: data.bom.finished_good.category, label: data.bom.finished_good.category})
+
+      setProcesses(data.bom.processes);
+
+      const inputs: any = [];
+      data.bom.raw_materials.forEach((material: any) => {
+        inputs.push({
+          item_id: material.item_id,
+          item_name: {value: material.item_id, label: material.item_name},
+          description: material.description,
+          quantity: material.quantity,
+          uom: material.uom,
+          //   image?: string;
+          category: {value: material.category, label: material.category},
+          assembly_phase: {value: material?.assembly_phase, label: material?.assembly_phase},
+          supplier: {
+            value: material?.supplier?._id, label: material?.supplier?.name
+          },
+          supporting_doc: "",
+          comments: material?.comments,
+          unit_cost: material.unit_cost,
+          total_part_cost: material.total_part_cost,
+        });
+      });
+      setRawMaterials(inputs);
+      
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
+    } finally {
+      setIsLoadingBom(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBomDetails();
+  }, []);
 
   useEffect(() => {
     if (
@@ -140,10 +213,10 @@ const AddBom: React.FC<AddBomProps> = ({
 
         <div className="mt-8 px-5">
           <h2 className="text-2xl font-semibold py-5 text-center mb-6 border-y bg-[#f9fafc]">
-            Add New BOM
+            Update BOM
           </h2>
 
-          <form onSubmit={addBomHandler}>
+          <form onSubmit={updateBomHandler}>
             <RawMaterial inputs={rawMaterials} setInputs={setRawMaterials} />
             <Process inputs={processes} setInputs={setProcesses} />
             <div>
@@ -312,4 +385,4 @@ const AddBom: React.FC<AddBomProps> = ({
   );
 };
 
-export default AddBom;
+export default UpdateBom;

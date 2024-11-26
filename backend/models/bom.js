@@ -31,9 +31,9 @@ const bomSchema = new Schema({
     approval_date: {
         type: Date
     },
-    product_name: {
+    bom_name: {
         type: String,
-        required: [true, 'Product name is a required field'],
+        required: [true, 'BOM name is a required field'],
     },
     parts_count: {
         type: Number,
