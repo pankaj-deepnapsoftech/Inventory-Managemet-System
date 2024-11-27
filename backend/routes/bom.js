@@ -1,15 +1,16 @@
 const express = require('express');
-const { create, unapproved, update, remove, details, all, removeRawMaterial, removeFinishedGood } = require('../controllers/bom');
+const { create, unapproved, update, remove, details, all } = require('../controllers/bom');
+const { isAuthenticated } = require('../middlewares/isAuthenticated');
 const router = express.Router();
 
-router.post('/', create);
+router.post('/', isAuthenticated, create);
 router.get('/all', all);
-router.get('/unapproved', unapproved);
+router.get('/unapproved', isAuthenticated, unapproved);
 router.route('/:id')
-        .put(update)
-        .delete(remove)
-        .get(details)
-router.delete('/remove/raw-material/:id', removeRawMaterial);
-router.delete('/remove/finished-good/:id', removeFinishedGood);
+        .put(isAuthenticated, update)
+        .delete(isAuthenticated, remove)
+        .get(isAuthenticated, details)
+// router.delete('/remove/raw-material/:id', isAuthenticated, removeRawMaterial);
+// router.delete('/remove/finished-good/:id', isAuthenticated, removeFinishedGood);
 
 module.exports = router;

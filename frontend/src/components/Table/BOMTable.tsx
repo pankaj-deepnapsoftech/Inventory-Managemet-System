@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
     Cell,
   Column,
@@ -45,7 +45,6 @@ const BOMTable: React.FC<BOMTableProps> = ({
       { Header: "BOM Name", accessor: "bom_name" },
       { Header: "Parts Count", accessor: "parts_count" },
       { Header: "Total Cost", accessor: "total_cost" },
-      { Header: "Approved On", accessor: "approval_date" },
       { Header: "Approved By", accessor: "approved_by" },
       { Header: "Created On", accessor: "createdAt" },
       { Header: "Last Updated", accessor: "updatedAt" },
@@ -61,13 +60,12 @@ const BOMTable: React.FC<BOMTableProps> = ({
     page,
     state: { pageIndex },
   }: TableInstance<{
-    product_name: string;
-    parts_count: string;
-    total_cost: string;
-    approval_date?: string;
-    approved_by: string;
-    createdAt: string;
-    updatedAt: string;
+    bom_name: string,
+    parts_count: string,
+    total_cost: string,
+    approved_by: string,
+    createdAt: string,
+    updatedAt: string
   }> = useTable(
     {
       columns,
@@ -91,22 +89,13 @@ const BOMTable: React.FC<BOMTableProps> = ({
       <Table variant="simple" {...getTableProps()}>
         <Thead className="text-sm font-semibold">
           {headerGroups.map(
-            (
-              hg: HeaderGroup<{
-                name: string;
-                email: string;
-                phone: string;
-                gst_number?: string;
-                company_name: string;
-                company_email: string;
-                company_phone: string;
-                address_line1: string;
-                address_line2?: string;
-                pincode?: string;
-                city: string;
-                state?: string;
-                createdAt: string;
-                updatedAt: string;
+            (hg<{
+              bom_name: string,
+              parts_count: string,
+              total_cost: string,
+              approved_by: string,
+              createdAt: string,
+              updatedAt: string
               }>
             ) => {
               return (
@@ -168,7 +157,7 @@ const BOMTable: React.FC<BOMTableProps> = ({
                 {row.cells.map((cell: Cell) => {
                   return (
                     <Td fontWeight="500" {...cell.getCellProps()}>
-                      {cell.column.id !== 'createdAt' && cell.column.id !== 'updatedAt' && cell.render("Cell")}
+                      {cell.column.id !== 'createdAt' && cell.column.id !== 'updatedAt' && cell.column.id !== 'approved_by' && cell.render("Cell")}
 
                       {cell.column.id === "createdAt" &&
                         row.original?.createdAt && (
@@ -186,6 +175,11 @@ const BOMTable: React.FC<BOMTableProps> = ({
                             )}
                           </span>
                         )}
+                      {cell.column.id === "approved_by" &&
+                          <span>
+                            {row.original?.approved_by?.first_name + " " + row.original?.approved_by?.last_name}
+                          </span>
+                        }
                     </Td>
                   );
                 })}

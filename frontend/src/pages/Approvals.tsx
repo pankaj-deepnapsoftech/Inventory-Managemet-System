@@ -88,7 +88,7 @@ const Approvals: React.FC = () => {
       setProducts(data.unapproved);
       setFilteredProducts(data.unapproved);
     } catch (err: any) {
-      toast.error(err?.message || "Something went wrong");
+      toast.error(err?.data?.message || "Something went wrong");
     } finally {
       setIsLoadingProducts(false);
     }
@@ -103,7 +103,7 @@ const Approvals: React.FC = () => {
       toast.success(response.message);
       fetchUnapprovedProductsHandler();
     } catch (err: any) {
-      toast.error(err?.message || "Something went wrong");
+      toast.error(err?.data?.message || "Something went wrong");
     }
   };
 
@@ -134,7 +134,7 @@ const Approvals: React.FC = () => {
       setStores(data.unapproved);
       setFilteredStores(data.unapproved);
     } catch (err: any) {
-      toast.error(err?.message || "Something went wrong");
+      toast.error(err?.data?.message || "Something went wrong");
     } finally {
       setIsLoadingStores(false);
     }
@@ -146,7 +146,7 @@ const Approvals: React.FC = () => {
       toast.success(response.message);
       fetchUnapprovedStoresHandler();
     } catch (err: any) {
-      toast.error(err?.message || "Something went wrong");
+      toast.error(err?.data?.message || "Something went wrong");
     }
   };
 
@@ -177,7 +177,7 @@ const Approvals: React.FC = () => {
       setBuyers(data.agents);
       setFilteredBuyers(data.agents);
     } catch (err: any) {
-      toast.error(err?.message || "Something went wrong");
+      toast.error(err?.data?.message || "Something went wrong");
     } finally {
       setIsLoadingBuyers(false);
     }
@@ -199,7 +199,7 @@ const Approvals: React.FC = () => {
       setSellers(data.agents);
       setFilteredSellers(data.agents);
     } catch (err: any) {
-      toast.error(err?.message || "Something went wrong");
+      toast.error(err?.data?.message || "Something went wrong");
     } finally {
       setIsLoadingBuyers(false);
     }
@@ -212,7 +212,7 @@ const Approvals: React.FC = () => {
       fetchUnapprovedBuyersHandler();
       fetchUnapprovedSellersHandler();
     } catch (err: any) {
-      toast.error(err?.message || "Something went wrong");
+      toast.error(err?.data?.message || "Something went wrong");
     }
   };
 
@@ -245,7 +245,7 @@ const Approvals: React.FC = () => {
       setBoms(data.boms);
       setFilteredBoms(data.boms);
     } catch (err: any) {
-      toast.error(err?.message || "Something went wrong");
+      toast.error(err?.data?.message || "Something went wrong");
     } finally {
       setIsLoadingBoms(false);
     }
@@ -257,7 +257,7 @@ const Approvals: React.FC = () => {
       toast.success(response.message);
       fetchUnapprovedBomsHandler();
     } catch (err: any) {
-      toast.error(err?.message || "Something went wrong");
+      toast.error(err?.data?.message || "Something went wrong");
     }
   };
 
