@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import {
   Table,
   TableContainer,
@@ -118,7 +120,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
     headerGroups,
     prepareRow,
     page,
+    nextPage,
+    previousPage,
+    canNextPage,
+    canPreviousPage,
     state: { pageIndex },
+    pageCount,
   }: TableInstance<{
     name: string;
     product_id: string;
@@ -129,6 +136,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
     min_stock?: number;
     max_stock?: number;
     hsn_code?: number;
+    createdAt: string;
+    updatedAt: string;
   }> = useTable(
     {
       columns,
@@ -149,147 +158,173 @@ const ProductTable: React.FC<ProductTableProps> = ({
         </div>
       )}
       {!isLoadingProducts && products.length > 0 && (
-        <TableContainer>
-          <Table variant="simple" {...getTableProps()}>
-            <Thead className="text-sm font-semibold">
-              {headerGroups.map(
-                (
-                  hg: HeaderGroup<{
-                    name: string;
-                    product_id: string;
-                    uom: string;
-                    category: string;
-                    current_stock: number;
-                    price: number;
-                    min_stock?: number;
-                    max_stock?: number;
-                    hsn_code?: number;
-                  }>
-                ) => {
+        <div>
+          <TableContainer>
+            <Table variant="simple" {...getTableProps()}>
+              <Thead className="text-sm font-semibold">
+                {headerGroups.map(
+                  (
+                    hg: HeaderGroup<{
+                      name: string;
+                      product_id: string;
+                      uom: string;
+                      category: string;
+                      current_stock: number;
+                      price: number;
+                      min_stock?: number;
+                      max_stock?: number;
+                      hsn_code?: number;
+                      createdAt: string;
+                      updatedAt: string;
+                    }>
+                  ) => {
+                    return (
+                      <Tr {...hg.getHeaderGroupProps()}>
+                        {hg.headers.map((column: any) => {
+                          return (
+                            <Th
+                              textTransform="capitalize"
+                              fontSize="12px"
+                              fontWeight="700"
+                              color="black"
+                              backgroundColor="#fafafa"
+                              borderLeft="1px solid #d7d7d7"
+                              borderRight="1px solid #d7d7d7"
+                              {...column.getHeaderProps(
+                                column.getSortByToggleProps()
+                              )}
+                            >
+                              <p className="flex">
+                                {column.render("Header")}
+                                {column.isSorted && (
+                                  <span>
+                                    {column.isSortedDesc ? (
+                                      <FaCaretDown />
+                                    ) : (
+                                      <FaCaretUp />
+                                    )}
+                                  </span>
+                                )}
+                              </p>
+                            </Th>
+                          );
+                        })}
+                        <Th
+                          textTransform="capitalize"
+                          fontSize="12px"
+                          fontWeight="700"
+                          color="black"
+                          backgroundColor="#fafafa"
+                          borderLeft="1px solid #d7d7d7"
+                          borderRight="1px solid #d7d7d7"
+                        >
+                          Actions
+                        </Th>
+                      </Tr>
+                    );
+                  }
+                )}
+              </Thead>
+              <Tbody {...getTableBodyProps()}>
+                {page.map((row: any) => {
+                  prepareRow(row);
+
                   return (
-                    <Tr {...hg.getHeaderGroupProps()}>
-                      {hg.headers.map((column: any) => {
+                    <Tr
+                      className="relative hover:bg-[#e4e4e4] hover:cursor-pointer text-base lg:text-sm"
+                      {...row.getRowProps()}
+                    >
+                      {row.cells.map((cell: Cell) => {
                         return (
-                          <Th
-                            textTransform="capitalize"
-                            fontSize="12px"
-                            fontWeight="700"
-                            color="black"
-                            backgroundColor="#fafafa"
-                            borderLeft="1px solid #d7d7d7"
-                            borderRight="1px solid #d7d7d7"
-                            {...column.getHeaderProps(
-                              column.getSortByToggleProps()
-                            )}
-                          >
-                            <p className="flex">
-                              {column.render("Header")}
-                              {column.isSorted && (
+                          <Td fontWeight="500" {...cell.getCellProps()}>
+                            {cell.column.id !== "createdAt" &&
+                              cell.column.id !== "updatedAt" &&
+                              cell.render("Cell")}
+
+                            {cell.column.id === "createdAt" &&
+                              row.original?.createdAt && (
                                 <span>
-                                  {column.isSortedDesc ? (
-                                    <FaCaretDown />
-                                  ) : (
-                                    <FaCaretUp />
+                                  {moment(row.original?.createdAt).format(
+                                    "DD/MM/YYYY"
                                   )}
                                 </span>
                               )}
-                            </p>
-                          </Th>
+                            {cell.column.id === "updatedAt" &&
+                              row.original?.updatedAt && (
+                                <span>
+                                  {moment(row.original?.updatedAt).format(
+                                    "DD/MM/YYYY"
+                                  )}
+                                </span>
+                              )}
+                          </Td>
                         );
                       })}
-                      <Th
-                        textTransform="capitalize"
-                        fontSize="12px"
-                        fontWeight="700"
-                        color="black"
-                        backgroundColor="#fafafa"
-                        borderLeft="1px solid #d7d7d7"
-                        borderRight="1px solid #d7d7d7"
-                      >
-                        Actions
-                      </Th>
+                      <Td className="flex gap-x-2">
+                        {openProductDetailsDrawerHandler && (
+                          <MdOutlineVisibility
+                            className="hover:scale-110"
+                            size={16}
+                            onClick={() =>
+                              openProductDetailsDrawerHandler(row.original?._id)
+                            }
+                          />
+                        )}
+                        {openUpdateProductDrawerHandler && (
+                          <MdEdit
+                            className="hover:scale-110"
+                            size={16}
+                            onClick={() =>
+                              openUpdateProductDrawerHandler(row.original?._id)
+                            }
+                          />
+                        )}
+                        {deleteProductHandler && (
+                          <MdDeleteOutline
+                            className="hover:scale-110"
+                            size={16}
+                            onClick={() =>
+                              deleteProductHandler(row.original?._id)
+                            }
+                          />
+                        )}
+                        {approveProductHandler && (
+                          <FcApproval
+                            className="hover:scale-110"
+                            size={16}
+                            onClick={() =>
+                              approveProductHandler(row.original?._id)
+                            }
+                          />
+                        )}
+                      </Td>
                     </Tr>
                   );
-                }
-              )}
-            </Thead>
-            <Tbody {...getTableBodyProps()}>
-              {page.map((row: any) => {
-                prepareRow(row);
+                })}
+              </Tbody>
+            </Table>
+          </TableContainer>
 
-                return (
-                  <Tr
-                    className="relative hover:bg-[#e4e4e4] hover:cursor-pointer text-base lg:text-sm"
-                    {...row.getRowProps()}
-                  >
-                    {row.cells.map((cell: Cell) => {
-                      return (
-                        <Td fontWeight="500" {...cell.getCellProps()}>
-                          {cell.column.id !== 'createdAt' && cell.column.id !== 'updatedAt' && cell.render("Cell")}
-
-                          {cell.column.id === "createdAt" &&
-                            row.original?.createdAt && (
-                              <span>
-                                {moment(row.original?.createdAt).format(
-                                  "DD/MM/YYYY"
-                                )}
-                              </span>
-                            )}
-                          {cell.column.id === "updatedAt" &&
-                            row.original?.updatedAt && (
-                              <span>
-                                {moment(row.original?.updatedAt).format(
-                                  "DD/MM/YYYY"
-                                )}
-                              </span>
-                            )}
-                        </Td>
-                      );
-                    })}
-                    <Td className="flex gap-x-2">
-                      {openProductDetailsDrawerHandler && (
-                        <MdOutlineVisibility
-                          className="hover:scale-110"
-                          size={16}
-                          onClick={() =>
-                            openProductDetailsDrawerHandler(row.original?._id)
-                          }
-                        />
-                      )}
-                      {openUpdateProductDrawerHandler && (
-                        <MdEdit
-                          className="hover:scale-110"
-                          size={16}
-                          onClick={() =>
-                            openUpdateProductDrawerHandler(row.original?._id)
-                          }
-                        />
-                      )}
-                      {deleteProductHandler && (
-                        <MdDeleteOutline
-                          className="hover:scale-110"
-                          size={16}
-                          onClick={() =>
-                            deleteProductHandler(row.original?._id)
-                          }
-                        />
-                      )}
-                      {approveProductHandler && (
-                        <FcApproval
-                          className="hover:scale-110"
-                          size={16}
-                          onClick={() =>
-                            approveProductHandler(row.original?._id)
-                          }
-                        />
-                      )}
-                    </Td>
-                  </Tr>
-                );
-              })}
-            </Tbody>
-          </Table>
-        </TableContainer>
+          <div className="w-[max-content] m-auto my-7">
+            <button
+              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
+              disabled={!canPreviousPage}
+              onClick={previousPage}
+            >
+              Prev
+            </button>
+            <span className="mx-3 text-sm md:text-lg lg:text-xl xl:text-base">
+              {pageIndex + 1} of {pageCount}
+            </span>
+            <button
+              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
+              disabled={!canNextPage}
+              onClick={nextPage}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

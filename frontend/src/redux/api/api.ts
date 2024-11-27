@@ -173,7 +173,7 @@ const storeApi = createApi({
     deleteStores: builder.mutation({
       query: (_id) => ({
         url: `${_id}`,
-        method: "DELETE"
+        method: "DELETE",
       }),
       invalidatesTags: ["Store"],
     }),
@@ -233,7 +233,7 @@ const agentApi = createApi({
     deleteAgent: builder.mutation({
       query: (_id) => ({
         url: `${_id}`,
-        method: "DELETE"
+        method: "DELETE",
       }),
       invalidatesTags: ["Agent"],
     }),
@@ -253,57 +253,108 @@ const agentApi = createApi({
 const bomApi = createApi({
   reducerPath: "bomApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_BACKEND_URL+'bom',
-    mode: 'cors',
-    prepareHeaders: (headers)=>{
+    baseUrl: process.env.REACT_APP_BACKEND_URL + "bom",
+    mode: "cors",
+    prepareHeaders: (headers) => {
       const cookies = parseCookies();
       const token = cookies?.access_token;
-      if(token){
-        headers.set('Authorization', `Bearer ${token}`);
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
-    }
+    },
   }),
   tagTypes: ["BOM"],
 
-  endpoints: (builder)=>({
+  endpoints: (builder) => ({
     fetchBoms: builder.query({
-      query: ()=>"/all",
-      providesTags: ["BOM"]
+      query: () => "/all",
+      providesTags: ["BOM"],
     }),
     addBom: builder.mutation({
-      query: (data)=>({
-        url: '/',
+      query: (data) => ({
+        url: "/",
         method: "POST",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ["BOM"]
+      invalidatesTags: ["BOM"],
     }),
     updateBOM: builder.mutation({
-      query: (data)=>({
+      query: (data) => ({
         url: `/${data?._id}`,
         method: "PUT",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ["BOM"]
+      invalidatesTags: ["BOM"],
     }),
     deleteBom: builder.mutation({
-      query: (_id)=>({
+      query: (_id) => ({
         url: `/${_id}`,
-        method: "DELETE"
-      })
+        method: "DELETE",
+      }),
     }),
     bomDetails: builder.query({
-      query: (_id)=>`/${_id}`
+      query: (_id) => `/${_id}`,
     }),
     unapprovedBoms: builder.query({
-      query: (_id)=> '/unapproved'
+      query: (_id) => "/unapproved",
+    }),
+  }),
+});
+
+const userRoleApi = createApi({
+  reducerPath: "userRoleApi",
+  baseQuery: fetchBaseQuery({
+    baseUrl: process.env.REACT_APP_BACKEND_URL + "role",
+    mode: "cors",
+    prepareHeaders: (headers) => {
+      const cookies = parseCookies();
+      const token = cookies?.access_token;
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
+  tagTypes: ["Role"],
+
+  endpoints: (builder) => ({
+    fetchRoles: builder.query({
+      query: () => "/",
+      providesTags: ["Role"],
+    }),
+    addRole: builder.mutation({
+      query: (data) => ({
+        url: "/",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Role"],
+    }),
+    updateRole: builder.mutation({
+      query: (data) => ({
+        url: "/",
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Role"],
+    }),
+    deleteRole: builder.mutation({
+      query: (data)=>({
+        url: '/',
+        method: "DELETE",
+        body: data
+      }),
+      invalidatesTags: ["Role"]
+    }),
+    roleDetails: builder.query({
+      query: (_id)=>`/${_id}`
     })
-  })
+  }),
 });
 
 // export default api;
-export { api, productApi, storeApi, agentApi, bomApi };
+export { api, productApi, storeApi, agentApi, bomApi, userRoleApi };
 
 // Authentication APIs
 export const {
@@ -345,7 +396,7 @@ export const {
   useDeleteAgentMutation,
   useLazyAgentDetailsQuery,
   useLazyUnapprovedBuyersQuery,
-  useLazyUnapprovedSellersQuery
+  useLazyUnapprovedSellersQuery,
 } = agentApi;
 
 // BOM APIs
@@ -355,5 +406,14 @@ export const {
   useUpdateBOMMutation,
   useDeleteBomMutation,
   useLazyBomDetailsQuery,
-  useLazyUnapprovedBomsQuery
+  useLazyUnapprovedBomsQuery,
 } = bomApi;
+
+// Use Role APIs
+export const {
+  useLazyFetchRolesQuery,
+  useAddRoleMutation,
+  useUpdateRoleMutation,
+  useDeleteRoleMutation,
+  useLazyRoleDetailsQuery
+} = userRoleApi;

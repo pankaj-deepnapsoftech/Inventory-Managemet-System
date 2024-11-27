@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import {
   Table,
   TableContainer,
@@ -64,14 +66,14 @@ const StoreTable: React.FC<StoreTableProps> = ({
     updatedAt: string;
   }>[] = useMemo(
     () => [
-        {
-            Header: "Name",
-            accessor: "name",
-        },
-        {
-          Header: "GST No.",
-          accessor: "gst_number",
-        },
+      {
+        Header: "Name",
+        accessor: "name",
+      },
+      {
+        Header: "GST No.",
+        accessor: "gst_number",
+      },
       {
         Header: "Address Line 1",
         accessor: "address_line1",
@@ -110,7 +112,12 @@ const StoreTable: React.FC<StoreTableProps> = ({
     headerGroups,
     prepareRow,
     page,
+    nextPage,
+    previousPage,
+    canNextPage,
+    canPreviousPage,
     state: { pageIndex },
+    pageCount,
   }: TableInstance<{
     name: string;
     gst_number: string;
@@ -141,147 +148,171 @@ const StoreTable: React.FC<StoreTableProps> = ({
         </div>
       )}
       {!isLoadingStores && stores.length > 0 && (
-        <TableContainer>
-          <Table variant="simple" {...getTableProps()}>
-            <Thead className="text-sm font-semibold">
-              {headerGroups.map(
-                (
-                  hg: HeaderGroup<{
-                    name: string;
-                    gst_number: string;
-                    address_line1: string;
-                    address_line2?: string;
-                    pincode?: string;
-                    city: string;
-                    state: string;
-                    createdAt: string;
-                    updatedAt: string;
-                  }>
-                ) => {
+        <div>
+          <TableContainer>
+            <Table variant="simple" {...getTableProps()}>
+              <Thead className="text-sm font-semibold">
+                {headerGroups.map(
+                  (
+                    hg: HeaderGroup<{
+                      name: string;
+                      gst_number: string;
+                      address_line1: string;
+                      address_line2?: string;
+                      pincode?: string;
+                      city: string;
+                      state: string;
+                      createdAt: string;
+                      updatedAt: string;
+                    }>
+                  ) => {
+                    return (
+                      <Tr {...hg.getHeaderGroupProps()}>
+                        {hg.headers.map((column: any) => {
+                          return (
+                            <Th
+                              textTransform="capitalize"
+                              fontSize="12px"
+                              fontWeight="700"
+                              color="black"
+                              backgroundColor="#fafafa"
+                              borderLeft="1px solid #d7d7d7"
+                              borderRight="1px solid #d7d7d7"
+                              {...column.getHeaderProps(
+                                column.getSortByToggleProps()
+                              )}
+                            >
+                              <p className="flex">
+                                {column.render("Header")}
+                                {column.isSorted && (
+                                  <span>
+                                    {column.isSortedDesc ? (
+                                      <FaCaretDown />
+                                    ) : (
+                                      <FaCaretUp />
+                                    )}
+                                  </span>
+                                )}
+                              </p>
+                            </Th>
+                          );
+                        })}
+                        <Th
+                          textTransform="capitalize"
+                          fontSize="12px"
+                          fontWeight="700"
+                          color="black"
+                          backgroundColor="#fafafa"
+                          borderLeft="1px solid #d7d7d7"
+                          borderRight="1px solid #d7d7d7"
+                        >
+                          Actions
+                        </Th>
+                      </Tr>
+                    );
+                  }
+                )}
+              </Thead>
+              <Tbody {...getTableBodyProps()}>
+                {page.map((row: any) => {
+                  prepareRow(row);
+
                   return (
-                    <Tr {...hg.getHeaderGroupProps()}>
-                      {hg.headers.map((column: any) => {
+                    <Tr
+                      className="relative hover:bg-[#e4e4e4] hover:cursor-pointer text-base lg:text-sm"
+                      {...row.getRowProps()}
+                    >
+                      {row.cells.map((cell: Cell) => {
                         return (
-                          <Th
-                            textTransform="capitalize"
-                            fontSize="12px"
-                            fontWeight="700"
-                            color="black"
-                            backgroundColor="#fafafa"
-                            borderLeft="1px solid #d7d7d7"
-                            borderRight="1px solid #d7d7d7"
-                            {...column.getHeaderProps(
-                              column.getSortByToggleProps()
-                            )}
-                          >
-                            <p className="flex">
-                              {column.render("Header")}
-                              {column.isSorted && (
+                          <Td fontWeight="500" {...cell.getCellProps()}>
+                            {cell.column.id !== "createdAt" &&
+                              cell.column.id !== "updatedAt" &&
+                              cell.render("Cell")}
+
+                            {cell.column.id === "createdAt" &&
+                              row.original?.createdAt && (
                                 <span>
-                                  {column.isSortedDesc ? (
-                                    <FaCaretDown />
-                                  ) : (
-                                    <FaCaretUp />
+                                  {moment(row.original?.createdAt).format(
+                                    "DD/MM/YYYY"
                                   )}
                                 </span>
                               )}
-                            </p>
-                          </Th>
+                            {cell.column.id === "updatedAt" &&
+                              row.original?.updatedAt && (
+                                <span>
+                                  {moment(row.original?.updatedAt).format(
+                                    "DD/MM/YYYY"
+                                  )}
+                                </span>
+                              )}
+                          </Td>
                         );
                       })}
-                      <Th
-                        textTransform="capitalize"
-                        fontSize="12px"
-                        fontWeight="700"
-                        color="black"
-                        backgroundColor="#fafafa"
-                        borderLeft="1px solid #d7d7d7"
-                        borderRight="1px solid #d7d7d7"
-                      >
-                        Actions
-                      </Th>
+                      <Td className="flex gap-x-2">
+                        {openStoreDetailsDrawerHandler && (
+                          <MdOutlineVisibility
+                            className="hover:scale-110"
+                            size={16}
+                            onClick={() =>
+                              openStoreDetailsDrawerHandler(row.original?._id)
+                            }
+                          />
+                        )}
+                        {openUpdateStoreDrawerHandler && (
+                          <MdEdit
+                            className="hover:scale-110"
+                            size={16}
+                            onClick={() =>
+                              openUpdateStoreDrawerHandler(row.original?._id)
+                            }
+                          />
+                        )}
+                        {deleteStoreHandler && (
+                          <MdDeleteOutline
+                            className="hover:scale-110"
+                            size={16}
+                            onClick={() =>
+                              deleteStoreHandler(row.original?._id)
+                            }
+                          />
+                        )}
+                        {approveStoreHandler && (
+                          <FcApproval
+                            className="hover:scale-110"
+                            size={16}
+                            onClick={() =>
+                              approveStoreHandler(row.original?._id)
+                            }
+                          />
+                        )}
+                      </Td>
                     </Tr>
                   );
-                }
-              )}
-            </Thead>
-            <Tbody {...getTableBodyProps()}>
-              {page.map((row: any) => {
-                prepareRow(row);
+                })}
+              </Tbody>
+            </Table>
+          </TableContainer>
 
-                return (
-                  <Tr
-                    className="relative hover:bg-[#e4e4e4] hover:cursor-pointer text-base lg:text-sm"
-                    {...row.getRowProps()}
-                  >
-                    {row.cells.map((cell: Cell) => {
-                      return (
-                        <Td fontWeight="500" {...cell.getCellProps()}>
-                          {cell.column.id !== 'createdAt' && cell.column.id !== 'updatedAt' && cell.render("Cell")}
-
-                          {cell.column.id === "createdAt" &&
-                            row.original?.createdAt && (
-                              <span>
-                                {moment(row.original?.createdAt).format(
-                                  "DD/MM/YYYY"
-                                )}
-                              </span>
-                            )}
-                          {cell.column.id === "updatedAt" &&
-                            row.original?.updatedAt && (
-                              <span>
-                                {moment(row.original?.updatedAt).format(
-                                  "DD/MM/YYYY"
-                                )}
-                              </span>
-                            )}
-                        </Td>
-                      );
-                    })}
-                    <Td className="flex gap-x-2">
-                      {openStoreDetailsDrawerHandler && (
-                        <MdOutlineVisibility
-                          className="hover:scale-110"
-                          size={16}
-                          onClick={() =>
-                            openStoreDetailsDrawerHandler(row.original?._id)
-                          }
-                        />
-                      )}
-                      {openUpdateStoreDrawerHandler && (
-                        <MdEdit
-                          className="hover:scale-110"
-                          size={16}
-                          onClick={() =>
-                            openUpdateStoreDrawerHandler(row.original?._id)
-                          }
-                        />
-                      )}
-                      {deleteStoreHandler && (
-                        <MdDeleteOutline
-                          className="hover:scale-110"
-                          size={16}
-                          onClick={() =>
-                            deleteStoreHandler(row.original?._id)
-                          }
-                        />
-                      )}
-                      {approveStoreHandler && (
-                        <FcApproval
-                          className="hover:scale-110"
-                          size={16}
-                          onClick={() =>
-                            approveStoreHandler(row.original?._id)
-                          }
-                        />
-                      )}
-                    </Td>
-                  </Tr>
-                );
-              })}
-            </Tbody>
-          </Table>
-        </TableContainer>
+          <div className="w-[max-content] m-auto my-7">
+            <button
+              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
+              disabled={!canPreviousPage}
+              onClick={previousPage}
+            >
+              Prev
+            </button>
+            <span className="mx-3 text-sm md:text-lg lg:text-xl xl:text-base">
+              {pageIndex + 1} of {pageCount}
+            </span>
+            <button
+              className="text-sm mt-2 bg-[#1640d6] py-1 px-4 text-white border-[1px] border-[#1640d6] rounded-3xl disabled:bg-[#b2b2b2] disabled:border-[#b2b2b2] disabled:cursor-not-allowed md:text-lg md:py-1 md:px-4 lg:text-xl lg:py-1 xl:text-base"
+              disabled={!canNextPage}
+              onClick={nextPage}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -24,7 +24,12 @@ const initialState = {
   // BOM Drawer
   isAddBomDrawerOpened: false,
   isUpdateBomDrawerOpened: false,
-  isBomDetailsDrawerOpened: false
+  isBomDetailsDrawerOpened: false,
+
+  // User Role Drawer
+  isAddRoleDrawerOpened: false,
+  isUpdateRoleDrawerOpened: false,
+  isRoleDetailsDrawerOpened: false
 };
 
 const drawersSlice = createSlice({
@@ -129,16 +134,37 @@ const drawersSlice = createSlice({
     closeUpdateBomDrawer: (state)=>{
       state.isUpdateBomDrawerOpened = false;
     },
-    // Buyer BOM Drawer
+    // BOM Details Drawer
     openBomDetailsDrawer: (state)=>{
       state.isBomDetailsDrawerOpened = true;
     },
     closeBomDetailsDrawer: (state)=>{
       state.isBomDetailsDrawerOpened = false;
+    },
+    // Add User Role Drawer
+    openAddRoleDrawer: (state)=>{
+      state.isAddRoleDrawerOpened = true;
+    },
+    closeAddRoleDrawer: (state)=>{
+      state.isAddRoleDrawerOpened = false;
+    },
+    // Update User Role Drawer
+    openUpdateRoleDrawer: (state)=>{
+      state.isUpdateRoleDrawerOpened = true;
+    },
+    closeUpdateRoleDrawer: (state)=>{
+      state.isUpdateRoleDrawerOpened = false;
+    },
+    // User Role Details Drawer
+    openRoleDetailsDrawer: (state)=>{
+      state.isRoleDetailsDrawerOpened = true;
+    },
+    closeRoleDetailsDrawer: (state)=>{
+      state.isRoleDetailsDrawerOpened = false;
     }
   },
 });
 
 export default drawersSlice;
-export const { openAddProductDrawer, closeAddProductDrawer, openUpdateProductDrawer, closeUpdateProductDrawer, openProductDetailsDrawer, closeProductDetailsDrawer, openAddStoreDrawer, closeAddStoreDrawer, openUpdateStoreDrawer, closeUpdateStoreDrawer, openStoreDetailsDrawer, closeStoreDetailsDrawer, openAddBuyerDrawer, closeAddBuyerDrawer, openUpdateBuyerDrawer, closeUpdateBuyerDrawer, openBuyerDetailsDrawer, closeBuyerDetailsDrawer, openAddSellerDrawer, closeAddSellerDrawer, openUpdateSellerDrawer, closeUpdateSellerDrawer, openSellerDetailsDrawer, closeSellerDetailsDrawer, openAddBomDrawer, closeAddBomDrawer, openUpdateBomDrawer, closeUpdateBomDrawer, openBomDetailsDrawer, closeBomDetailsDrawer } =
+export const { openAddProductDrawer, closeAddProductDrawer, openUpdateProductDrawer, closeUpdateProductDrawer, openProductDetailsDrawer, closeProductDetailsDrawer, openAddStoreDrawer, closeAddStoreDrawer, openUpdateStoreDrawer, closeUpdateStoreDrawer, openStoreDetailsDrawer, closeStoreDetailsDrawer, openAddBuyerDrawer, closeAddBuyerDrawer, openUpdateBuyerDrawer, closeUpdateBuyerDrawer, openBuyerDetailsDrawer, closeBuyerDetailsDrawer, openAddSellerDrawer, closeAddSellerDrawer, openUpdateSellerDrawer, closeUpdateSellerDrawer, openSellerDetailsDrawer, closeSellerDetailsDrawer, openAddBomDrawer, closeAddBomDrawer, openUpdateBomDrawer, closeUpdateBomDrawer, openBomDetailsDrawer, closeBomDetailsDrawer, openAddRoleDrawer, closeAddRoleDrawer, openUpdateRoleDrawer, closeUpdateRoleDrawer, openRoleDetailsDrawer, closeRoleDetailsDrawer } =
   drawersSlice.actions;

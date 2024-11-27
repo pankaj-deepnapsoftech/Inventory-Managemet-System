@@ -189,7 +189,7 @@ exports.details = TryCatch(async (req, res) => {
 exports.all = TryCatch(async (req, res) => {
   const boms = await BOM.find({ approved: true }).populate(
     "finished_good raw_materials approved_by"
-  );
+  ).sort({'updatedAt': -1});
   res.status(200).json({
     status: 200,
     success: true,
@@ -199,7 +199,7 @@ exports.all = TryCatch(async (req, res) => {
 exports.unapproved = TryCatch(async (req, res) => {
   const boms = await BOM.find({ approved: false }).populate(
     "finished_good raw_materials"
-  );
+  ).sort({'updatedAt': -1});
   res.status(200).json({
     status: 200,
     success: true,

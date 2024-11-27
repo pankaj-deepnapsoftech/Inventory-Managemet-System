@@ -9,7 +9,7 @@ exports.create = TryCatch(async (req, res) => {
   const createdRole = await UserRole.create({ ...role });
   res.status(200).json({
     status: 200,
-    success: false,
+    success: true,
     message: "User role has been created successfully",
     role: createdRole,
   });
@@ -27,7 +27,7 @@ exports.edit = TryCatch(async (req, res) => {
 
   const roleUpdated = await UserRole.findByIdAndUpdate(
     { _id },
-    { $set: { role }, $push: { permissions } },
+    { $set: { role, permissions } },
     { new: true }
   );
 
@@ -73,3 +73,19 @@ exports.details = TryCatch(async (req, res) => {
     userRole,
   });
 });
+exports.all = TryCatch(async (req, res)=>{
+  const roles = await UserRole.find().sort({'updatedAt': -1});
+  res.status(200).json({
+    status: 200,
+    success: true,
+    roles
+  })
+})
+// exports.permissions = TryCatch(async (req, res)=>{
+//   const permissionsAvailable = userRoleSchema.path('permissions').enumValues;
+//   res.status(200).json({
+//     status: 200,
+//     success: true,
+//     permissions: permissionsAvailable
+//   })
+// })

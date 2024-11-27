@@ -25,11 +25,10 @@ exports.sendEmail = async (sub, msg, recipientEmail) => {
         `,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error("Error sending email: ", error);
-    } else {
-      console.log("Email sent: ", info.response);
-    }
-  });
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent: ", info.response);
+  } catch (error) {
+    console.error("Error sending email: ", error);
+  }
 };
